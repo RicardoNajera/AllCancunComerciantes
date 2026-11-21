@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <title>All Cancún Comercios — Tu negocio, en orden</title>
+  <meta name="description" content="Panel para comercios de Cancún. Gestiona tu negocio, tu menú y tus pedidos." />
+  <meta name="theme-color" content="#0b0e13" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Cancún Comercios" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+  <!-- Estilos: tokens compartidos con la PWA del cliente -->
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/panel.css" />
+</head>
+<body>
+  <div class="app-shell" id="app">
+
+    <!-- Cabecera: cambia según la pestaña activa -->
+    <header class="app-topbar" id="app-topbar" hidden></header>
+
+    <!-- Aquí se pinta cada pestaña -->
+    <main class="app-screen" id="app-screen" aria-live="polite"></main>
+
+    <!-- Barra inferior: solo con sesión y negocio -->
+    <nav class="app-dock" id="app-dock" aria-label="Secciones del panel" hidden></nav>
+  </div>
+
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
+

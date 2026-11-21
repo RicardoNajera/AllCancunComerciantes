@@ -1,0 +1,95 @@
+/* ==========================================================================
+   All Cancún — Design tokens
+   Paleta neutra de alto contraste + acentos variados por categoría.
+   Pensada para todos los estratos: sin dorados, sin "lujo", sin códigos de clase.
+   ========================================================================== */
+
+:root {
+  /* Superficies — tema oscuro profundo */
+  --color-bg: #0b0e13;
+  --color-surface: #141922;
+  --color-surface-muted: #1b2130;
+  --color-border: rgba(255, 255, 255, 0.09);
+
+  /* Texto */
+  --color-text: #f2f5f9;
+  --color-text-secondary: #9aa6b8;
+  --color-text-inverse: #0b0e13;
+
+  /* Marca (aqua caribe, brilla sobre oscuro) */
+  --color-brand: #2fd6c4;
+  --color-brand-strong: #14b8a6;
+  --color-brand-soft: rgba(47, 214, 196, 0.14);
+
+  /* Acentos por categoría — neón contenido sobre oscuro */
+  --accent-viajes: #4fa8ff;
+  --accent-viajes-soft: rgba(79, 168, 255, 0.16);
+  --accent-tianguis: #ffa245;
+  --accent-tianguis-soft: rgba(255, 162, 69, 0.16);
+  --accent-comercios: #b98bff;
+  --accent-comercios-soft: rgba(185, 139, 255, 0.16);
+  --accent-mantenimiento: #35d6b6;
+  --accent-mantenimiento-soft: rgba(53, 214, 182, 0.16);
+  --accent-mujeres: #ff7bb0;
+  --accent-mujeres-soft: rgba(255, 123, 176, 0.16);
+  --accent-hombres: #6fb3e0;
+  --accent-hombres-soft: rgba(111, 179, 224, 0.16);
+  --accent-estudiantes: #ffcf5c;
+  --accent-estudiantes-soft: rgba(255, 207, 92, 0.16);
+  --accent-salud: #4fe08c;
+  --accent-salud-soft: rgba(79, 224, 140, 0.16);
+  --accent-hogar: #b9c3d1;
+  --accent-hogar-soft: rgba(185, 195, 209, 0.14);
+  --accent-comida: #ff8a5b;
+  --accent-comida-soft: rgba(255, 138, 91, 0.16);
+
+  /* Tipografía */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8125rem;
+  --font-size-md: 0.9375rem;
+  --font-size-lg: 1.0625rem;
+  --font-size-xl: 1.25rem;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Espaciado (escala 4px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Radios */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --radius-pill: 999px;
+
+  /* Sombras (profundas, sobre negro) */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.55);
+
+  /* Layout */
+  --app-max-width: 480px;
+  --tap-min: 44px;
+  --header-height: 68px;
+
+  /* Movimiento */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 140ms;
+  --duration-base: 220ms;
+
+  /* Safe areas (iOS) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}

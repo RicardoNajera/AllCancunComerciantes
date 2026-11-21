@@ -1,0 +1,20 @@
+{
+  "name": "All Cancún Comercios",
+  "short_name": "Cancún Negocios",
+  "description": "Panel de tu negocio en Cancún. Gestiona tu menú, tu tienda y tus ventas.",
+  "lang": "es-MX",
+  "id": "/AllCancunComercios/",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0e13",
+  "theme_color": "#0b0e13",
+  "dir": "ltr",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
