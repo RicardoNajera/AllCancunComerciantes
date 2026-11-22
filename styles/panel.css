@@ -487,6 +487,14 @@
   border-radius: var(--radius-sm);
 }
 
+/* En la tarjeta la miniatura no lleva relleno: la foto ocupa todo el
+   cuadro. Así se ve como en la app del cliente y no como un hueco. */
+.cm-photo--thumb.has-image {
+  padding: 0;
+  overflow: hidden;
+  background: var(--color-surface-muted);
+}
+
 .cm-photo--thumb .cm-photo__label,
 .cm-photo--square .cm-photo__label {
   font-size: 9px;

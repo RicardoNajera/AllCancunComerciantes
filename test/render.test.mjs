@@ -176,6 +176,29 @@ ok("lleva el acento de la categoria", tarjeta.includes("cm-tarjeta--comercios"))
 ok("no inventa estrellas", !tarjeta.includes("4.8"));
 ok("dice que no hay resenas", tarjeta.includes("Sin reseñas"));
 
+console.log("\n--- Miniatura de la tarjeta ---");
+/* Sin ninguna foto: recuadro punteado, nunca un <img> roto. */
+const sinFotos = tarjetaClienteHTML({ ...negocio, foto_url: null, logo_url: null });
+ok("sin fotos NO pinta img", !sinFotos.includes("cm-photo__img"));
+ok("sin fotos pinta el hueco", sinFotos.includes("cm-photo__ico"));
+
+/* Con logo: la miniatura es el logo. */
+const LOGO = "https://pub-xxx.r2.dev/negocios/n1/logo.webp";
+const PORTADA = "https://pub-xxx.r2.dev/negocios/n1/portada.webp";
+const conLogo = tarjetaClienteHTML({ ...negocio, logo_url: LOGO, foto_url: PORTADA });
+ok("con logo usa el logo", conLogo.includes(LOGO));
+ok("con logo NO usa la portada", !conLogo.includes(PORTADA));
+ok("con logo lleva clase has-image", conLogo.includes("has-image"));
+
+/* Sin logo pero con portada: se usa la portada como respaldo. */
+const soloPortada = tarjetaClienteHTML({ ...negocio, logo_url: null, foto_url: PORTADA });
+ok("sin logo cae en la portada", soloPortada.includes(PORTADA));
+ok("sin logo lleva has-image", soloPortada.includes("has-image"));
+
+/* Un logo vacío (espacios) cuenta como que no hay. */
+const logoVacio = tarjetaClienteHTML({ ...negocio, logo_url: "   ", foto_url: PORTADA });
+ok("logo en blanco se ignora", logoVacio.includes(PORTADA));
+
 console.log("\n--- Pestana Menu vacio ---");
 const menuVacio = menuHTML({ productos: [] });
 ok("dice que no hay productos", menuVacio.includes("Aún no tienes productos"));

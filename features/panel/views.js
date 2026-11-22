@@ -301,10 +301,24 @@ export function tiendaHTML({ negocio }) {
 export function tarjetaClienteHTML(negocio) {
   const accent = categoriaAccent(negocio.categoria);
   const categoria = categoriaLabel(negocio.categoria);
+
+  /* La miniatura de la tarjeta es el logo del negocio (la foto cuadrada
+     de arriba). Si todavía no hay logo, se usa la portada: se ve mejor
+     una foto real que un recuadro vacío. Sin ninguna de las dos, el
+     recuadro punteado avisa de que falta la imagen. */
+  const logo = String(negocio.logo_url || "").trim();
+  const portada = String(negocio.foto_url || "").trim();
+  const miniatura = logo || portada;
+
   return `
     <article class="cm-tarjeta cm-tarjeta--${escape(accent)}">
       <div class="cm-tarjeta__media">
-        ${photoSlot({ label: "", variant: "thumb" })}
+        ${photoSlot({
+          label: content.tienda.logoLabel,
+          variant: "thumb",
+          hasImage: Boolean(miniatura),
+          src: miniatura,
+        })}
       </div>
       <div class="cm-tarjeta__body">
         <h4 class="cm-tarjeta__name">${escape(negocio.nombre)}</h4>
