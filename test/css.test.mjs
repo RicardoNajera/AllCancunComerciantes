@@ -174,5 +174,22 @@ ok(
 ok("ya no existe el filtro gris global", !panel.includes("saturate(0)"));
 ok("ya no existe el velo gris", !panel.includes(".es-cerrado"));
 
+/* La cara del menú: redonda y con la foto real del negocio, sin deformar */
+console.log("\n--- Avatar redondo del menu ---");
+const av = panel.slice(
+  panel.indexOf(".cm-drawer__avatar {"),
+  panel.indexOf(".cm-drawer__who {")
+);
+ok("el avatar es un circulo", /border-radius:\s*50%/.test(av));
+ok(
+  "la foto rellena el circulo sin deformarse",
+  /\.cm-drawer__avatar--foto \{[^}]*object-fit:\s*cover/.test(av)
+);
+ok(
+  "la cara usa la foto real, no la inicial",
+  /\.cm-drawer__avatar--foto/.test(panel)
+);
+
+
 console.log(`\n${pasa} PASA / ${falla} FALLA`);
 if (falla > 0) process.exit(1);

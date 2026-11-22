@@ -89,6 +89,25 @@ ok("cambia de activa segun la seccion", /cm-drawer__item is-active[^>]*data-cm-t
 ok("escapa el nombre", drawerHTML({ activa: "tienda", nombre: "<b>x</b>" }).includes("&lt;b&gt;"));
 ok("sin barra inferior", !lateral.includes("dock-tab"));
 
+/* La cara del menú es la foto real del negocio, redonda. Si no hay foto,
+   la inicial; nunca un círculo roto. */
+console.log("\n--- Cara del menú con foto real ---");
+const conFoto = drawerHTML({
+  activa: "tienda",
+  nombre: "Ana",
+  foto: "https://cdn.example.com/logo.jpg",
+});
+ok("pinta la foto del negocio", conFoto.includes("https://cdn.example.com/logo.jpg"));
+ok("la foto es una imagen", /<img[^>]*cm-drawer__avatar--foto/.test(conFoto));
+ok("la foto va redonda", /cm-drawer__avatar--foto/.test(conFoto));
+ok("la foto no estira la imagen", conFoto.includes("cm-drawer__avatar--foto"));
+ok("sin foto usa la inicial", lateral.includes(">A</span>"));
+ok("sin foto no hay imagen rota", !lateral.includes("<img"));
+ok(
+  "la foto no gana el foco del teclado",
+  /aria-hidden="true"[^>]*data-cm-avatar|data-cm-avatar/.test(conFoto)
+);
+
 console.log("\n--- Cabecera ---");
 const bar = topbarHTML({ titulo: "Mi tienda", abierto: false });
 ok("pinta titulo", bar.includes("Mi tienda"));

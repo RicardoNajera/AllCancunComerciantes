@@ -108,12 +108,21 @@ export function topbarHTML({ titulo, subtitulo = "", accion = "", abierto = null
    Menú lateral: la única navegación del panel, con nombre y foto
    ========================================================================== */
 
-export function drawerHTML({ activa, nombre = "", sub = "" }) {
+export function drawerHTML({ activa, nombre = "", sub = "", foto = "" }) {
+  const cara = String(foto || "").trim();
   return `
     <nav class="cm-drawer" id="app-drawer" data-cm-drawer
       aria-label="${escape(content.menuTitle)}" aria-hidden="true">
       <div class="cm-drawer__head">
-        <span class="cm-drawer__avatar" aria-hidden="true">${escape(initial(nombre))}</span>
+        ${
+          cara
+            ? `<img class="cm-drawer__avatar cm-drawer__avatar--foto" src="${escape(
+                cara
+              )}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-cm-avatar />`
+            : `<span class="cm-drawer__avatar" aria-hidden="true">${escape(
+                initial(nombre)
+              )}</span>`
+        }
         <div class="cm-drawer__who">
           <p class="cm-drawer__name">${escape(nombre)}</p>
           ${sub ? `<p class="cm-drawer__sub">${escape(sub)}</p>` : ""}

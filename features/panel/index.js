@@ -41,6 +41,7 @@ import {
   estaAbierto,
 } from "./views.js";
 import { menuHTML, pedidosHTML } from "./views-menu.js";
+import { initial } from "./bits.js";
 import { ajustesHTML } from "./views-ajustes.js";
 import { negocioFormHTML } from "./views-form-negocio.js";
 import { productoFormHTML } from "./views-form-producto.js";
@@ -92,7 +93,7 @@ export async function mountPanel(root, { session, onSignedOut, topbar } = {}) {
     menuAbierto = false;
   }
 
-  function montarMenu(nombre, sub) {
+  function montarMenu(nombre, sub, foto) {
     desmontarMenu();
     const layer = menuLayer();
 
@@ -100,7 +101,22 @@ export async function mountPanel(root, { session, onSignedOut, topbar } = {}) {
     overlay.className = "cm-overlay is-open";
     overlay.setAttribute("data-cm-overlay", "");
 
-    layer.insertAdjacentHTML("beforeend", drawerHTML({ activa: tab, nombre, sub }));
+    layer.insertAdjacentHTML("beforeend", drawerHTML({ activa: tab, nombre, sub, foto }));
+
+    /* Si la URL de la foto ya no existe, el círculo no se queda roto:
+       vuelve a la inicial. Una imagen quebrada en la cabecera del menú
+       se ve peor que no tener foto. */
+    const avatar = layer.querySelector("[data-cm-avatar]");
+    if (avatar) {
+      avatar.addEventListener("error", () => {
+        const span = document.createElement("span");
+        span.className = "cm-drawer__avatar";
+        span.setAttribute("aria-hidden", "true");
+        span.textContent = initial(nombre);
+        avatar.replaceWith(span);
+      }, { once: true });
+    }
+
     layer.appendChild(overlay);
 
     const drawer = layer.querySelector("[data-cm-drawer]");
@@ -139,10 +155,10 @@ export async function mountPanel(root, { session, onSignedOut, topbar } = {}) {
     menuAbierto = true;
   }
 
-  function setMenu(open, nombre = "", sub = "") {
+  function setMenu(open, nombre = "", sub = "", foto = "") {
     if (open === menuAbierto) return;
     if (open) {
-      montarMenu(nombre, sub);
+      montarMenu(nombre, sub, foto);
     } else {
       desmontarMenu();
     }
@@ -280,9 +296,13 @@ export async function mountPanel(root, { session, onSignedOut, topbar } = {}) {
     const menuDatos = {
       nombre: nombreCuenta || content.accountFallback,
       sub: [negocio.nombre, email].filter(Boolean).join(" · "),
+      /* La cara del menú es la foto REAL del negocio. El logo es la foto
+         cuadrada (la que sale en la tarjeta del cliente); si todavía no
+         hay logo se usa la portada, que también es una foto suya. */
+      foto: String(negocio.logo_url || negocio.foto_url || "").trim(),
     };
     on(topbar.querySelector("[data-cm-menu-open]"), "click", () =>
-      setMenu(true, menuDatos.nombre, menuDatos.sub)
+      setMenu(true, menuDatos.nombre, menuDatos.sub, menuDatos.foto)
     );
 
     /* Interruptor de atención (abierto / cerrado) de la cabecera.

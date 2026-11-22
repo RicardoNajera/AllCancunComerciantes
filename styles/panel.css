@@ -240,17 +240,33 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+/* La cara del menú: redonda siempre. Con foto real del negocio se ve el
+   negocio; sin foto, la inicial sobre el degradado. El círculo es la forma
+   que la gente ya asocia con "esta es una persona o un local", no un
+   recuadro de app. */
 .cm-drawer__avatar {
   display: grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
   font-size: 1.0625rem;
   font-weight: var(--font-weight-bold);
   color: var(--color-text-inverse);
   background: linear-gradient(150deg, #2fd6c4 0%, #4fa8ff 100%);
+}
+
+/* Con foto: la imagen llena el círculo sin deformarse. `object-fit: cover`
+   recorta los bordes en vez de estirar la cara del local. El anillo
+   translúcido la separa del fondo oscuro del menú. */
+.cm-drawer__avatar--foto {
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  background: var(--color-surface-muted);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .cm-drawer__who {
