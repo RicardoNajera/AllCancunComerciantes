@@ -138,5 +138,17 @@ ok("el drawer va por encima de la dock", /z-index:\s*50/.test(bloqueDrawer));
 ok("existe la tarjeta de cristal", panel.includes(".cm-boot__glass"));
 ok("el cristal usa backdrop-filter", /backdrop-filter:\s*blur/.test(panel));
 
+/* Interruptor abierto/cerrado de la cabecera. Compacto, pero con la
+   etiqueta siempre visible: si se corta el texto no se entiende. */
+ok("existe el interruptor de cabecera", panel.includes(".cm-switch--top"));
+ok(
+  "el interruptor no parte la etiqueta",
+  /\.cm-switch--top \.cm-switch__label \{[^}]*white-space:\s*nowrap/.test(panel)
+);
+ok(
+  "el interruptor respeta reduced-motion",
+  /prefers-reduced-motion[\s\S]{0,500}cm-switch--top/.test(panel)
+);
+
 console.log(`\n${pasa} PASA / ${falla} FALLA`);
 if (falla > 0) process.exit(1);

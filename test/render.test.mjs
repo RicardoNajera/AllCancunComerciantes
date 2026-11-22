@@ -18,6 +18,7 @@ import {
   sinNegocioHTML,
   tiendaHTML,
   tarjetaClienteHTML,
+  estaAbierto,
 } from "../features/panel/views.js";
 import { menuHTML, pedidosHTML } from "../features/panel/views-menu.js";
 import { ajustesHTML } from "../features/panel/views-ajustes.js";
@@ -89,10 +90,13 @@ ok("escapa el nombre", drawerHTML({ activa: "tienda", nombre: "<b>x</b>" }).incl
 ok("sin barra inferior", !lateral.includes("dock-tab"));
 
 console.log("\n--- Cabecera ---");
-const bar = topbarHTML({ titulo: "Mi tienda", estado: "borrador" });
+const bar = topbarHTML({ titulo: "Mi tienda", abierto: false });
 ok("pinta titulo", bar.includes("Mi tienda"));
-ok("pinta estado", bar.includes("Borrador"));
-ok("sin estado no pinta pastilla", !topbarHTML({ titulo: "Menú" }).includes("cm-status"));
+ok("pinta el interruptor", bar.includes("data-cm-atencion"));
+ok(
+  "sin interruptor no pinta pastilla de estado",
+  !topbarHTML({ titulo: "Menú" }).includes("cm-status")
+);
 ok("escapa el titulo", topbarHTML({ titulo: "<b>x</b>" }).includes("&lt;b&gt;"));
 
 console.log("\n--- Estado vacio generico ---");
@@ -123,7 +127,7 @@ const tienda = tiendaHTML({ negocio });
 ok("pinta el nombre escapado", tienda.includes("&lt;script&gt;"));
 ok("NO inyecta el script", !tienda.includes("<script>alert"));
 ok("pinta la categoria", tienda.includes("Tienda / abarrotes"));
-ok("el badge de estado vive en la cabecera", topbarHTML({ titulo: "Tienda", estado: "borrador" }).includes("cm-status--draft"));
+ok("el interruptor vive en la cabecera", topbarHTML({ titulo: "Tienda", abierto: true }).includes("cm-switch--top"));
 ok("explica el estado borrador", tienda.includes("Solo lo ves tú"));
 ok("muestra el espacio de portada", tienda.includes("Foto de portada"));
 ok("muestra el espacio de logo", tienda.includes("Logo"));
@@ -161,28 +165,52 @@ ok("avisa que falta la colonia", tienda.includes("Sin colonia"));
 ok("avisa que falta el WhatsApp", tienda.includes("Sin WhatsApp"));
 ok("avisa que falta el horario", tienda.includes("Sin horario"));
 ok("avisa que falta la descripcion", tienda.includes("Todavía no escribiste"));
-ok("tiene el interruptor de atencion", tienda.includes("data-cm-atencion"));
-ok(
-  "el interruptor arranca en cerrado si es borrador",
-  tienda.includes('aria-checked="false"')
-);
-ok("el interruptor se llama switch", tienda.includes('role="switch"'));
+ok("ya no tiene boton publicar", !tienda.includes("data-cm-publicar"));
+ok("la tienda ya no repite el interruptor", !tienda.includes("data-cm-atencion"));
 ok("tiene boton editar", tienda.includes("data-cm-editar-negocio"));
 ok("la vista previa dice que no hay resenas", tienda.includes("Sin reseñas todavía"));
 
-const activo = tiendaHTML({ negocio: { ...negocio, estado: "activo" } });
-ok("publicado ya no muestra boton publicar", !activo.includes("data-cm-publicar"));
+console.log("\n--- Interruptor de atencion en la cabecera ---");
+ok("publicado cuenta como abierto", estaAbierto({ estado: "activo" }) === true);
+ok("borrador cuenta como cerrado", estaAbierto({ estado: "borrador" }) === false);
+ok("suspendido cuenta como cerrado", estaAbierto({ estado: "suspendido" }) === false);
+/* Cuando se conecte Supabase, manda la columna abierto sobre el estado */
 ok(
-  "el interruptor arranca abierto si esta publicado",
-  activo.includes('aria-checked="true"')
+  "respeta la columna abierto si existe",
+  estaAbierto({ estado: "activo", abierto: false }) === false
 );
-ok("publicado muestra la palabra Abierto", activo.includes(">Abierto<"));
-ok("borrador muestra la palabra Cerrado", tienda.includes(">Cerrado<"));
-/* Un negocio publicado sigue existiendo aunque este cerrado: no se borra
-   de la app, solo cambia lo que ve el cliente. */
 ok(
-  "cerrado aclara que el negocio sigue en la app",
-  tienda.includes("sigue en la app")
+  "respeta abierto=true aunque sea borrador",
+  estaAbierto({ estado: "borrador", abierto: true }) === true
+);
+ok("sin negocio no truena", estaAbierto(null) === false);
+
+/* La píldora "Publicado" ya no debe aparecer en ninguna parte */
+const cabActiva = topbarHTML({ titulo: "Tienda", subtitulo: "Tacos", abierto: true });
+const cabBorrador = topbarHTML({ titulo: "Tienda", subtitulo: "Tacos", abierto: false });
+const cabOtraPestania = topbarHTML({ titulo: "Menú", subtitulo: "Tacos" });
+ok(
+  "la cabecera ya no dice Publicado",
+  !cabActiva.includes("Publicado")
+);
+ok("la cabecera ya no pinta la pildora", !cabActiva.includes("cm-status"));
+ok("la cabecera tiene el interruptor", cabActiva.includes("data-cm-atencion"));
+ok("el interruptor se llama switch", cabActiva.includes('role="switch"'));
+ok(
+  "abierto arranca encendido",
+  cabActiva.includes('aria-checked="true"') && cabActiva.includes("is-on")
+);
+ok(
+  "cerrado arranca apagado",
+  cabBorrador.includes('aria-checked="false"') &&
+    !cabBorrador.includes("is-on")
+);
+ok("la etiqueta dice Abierto", cabActiva.includes(">Abierto<"));
+ok("la etiqueta dice Cerrado", cabBorrador.includes(">Cerrado<"));
+/* Solo Tienda lleva interruptor: en Menú/Pedidos/Ajustes no aplica */
+ok(
+  "otras pestanas no llevan interruptor",
+  !cabOtraPestania.includes("data-cm-atencion")
 );
 
 console.log("\n--- Tarjeta del cliente ---");

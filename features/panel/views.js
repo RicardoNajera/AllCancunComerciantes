@@ -14,7 +14,6 @@ import {
   initial,
   categoriaLabel,
   categoriaAccent,
-  estadoLabel,
   estadoHint,
   estadoTone,
   photoSlot,
@@ -64,9 +63,21 @@ export function loadingHTML() {
    Cabecera de cada pestaña
    ========================================================================== */
 
-/** Cabecera: menú + título + estado del negocio. La píldora vive aquí
- *  (solo en Tienda) para saber en un vistazo si está publicado. */
-export function topbarHTML({ titulo, subtitulo = "", accion = "", estado = "" }) {
+/**
+ * ¿El negocio está atendiendo ahora?
+ * Por ahora es solo visual: arranca "abierto" si ya está publicado, y en
+ * "cerrado" si todavía es borrador (un borrador no puede estar atendiendo).
+ * Cuando se conecte a Supabase, esto leerá negocio.abierto.
+ */
+export function estaAbierto(negocio) {
+  if (typeof negocio?.abierto === "boolean") return negocio.abierto;
+  return negocio?.estado === "activo";
+}
+
+/** Cabecera: menú + título + interruptor abierto/cerrado.
+ *  La píldora "Publicado" se quitó: ahora el estado lo dice el interruptor,
+ *  que además el comerciante puede tocar. */
+export function topbarHTML({ titulo, subtitulo = "", accion = "", abierto = null }) {
   return `
     <button type="button" class="cm-menu-btn" data-cm-menu-open
       aria-label="${escape(content.menuButton)}"
@@ -76,11 +87,19 @@ export function topbarHTML({ titulo, subtitulo = "", accion = "", estado = "" })
       ${subtitulo ? `<p class="cm-topbar__sub">${escape(subtitulo)}</p>` : ""}
     </div>
     ${
-      estado
-        ? `<span class="cm-status cm-status--${estadoTone(estado)}" title="${escape(
-            content.statusStateLabel
-          )}">${escape(estadoLabel(estado))}</span>`
-        : ""
+      abierto === null
+        ? ""
+        : `<button type="button" role="switch" aria-checked="${abierto ? "true" : "false"}"
+             aria-label="${escape(content.tienda.atencionTitle)}"
+             class="cm-switch cm-switch--top${abierto ? " is-on" : ""}"
+             data-cm-atencion>
+             <span class="cm-switch__track" aria-hidden="true">
+               <span class="cm-switch__thumb"></span>
+             </span>
+             <span class="cm-switch__label" data-cm-atencion-texto>${escape(
+               abierto ? content.tienda.atencionAbierto : content.tienda.atencionCerrado
+             )}</span>
+           </button>`
     }
     ${accion}`;
 }
@@ -171,14 +190,6 @@ export function sinNegocioHTML() {
 export function tiendaHTML({ negocio }) {
   const categoria = categoriaLabel(negocio.categoria);
   const accent = categoriaAccent(negocio.categoria);
-  const publicado = negocio.estado === "activo";
-
-  /* Interruptor de atención. Por ahora es solo visual: arranca en
-     "abierto" si el negocio ya está publicado, y en "cerrado" si todavía
-     es un borrador (un borrador no puede estar atendiendo).
-     Cuando se conecte a Supabase, esto leerá negocio.abierto. */
-  const abierto =
-    typeof negocio.abierto === "boolean" ? negocio.abierto : publicado;
 
   /* La foto se pinta si la columna trae URL. Si está vacía, el recuadro
      punteado ya comunica que falta; no hace falta un <img> roto. */
@@ -284,40 +295,6 @@ export function tiendaHTML({ negocio }) {
         <p class="cm-preview__label">${escape(content.tienda.summaryTitle)}</p>
         ${tarjetaClienteHTML(negocio)}
         <p class="cm-preview__hint">${escape(content.tienda.summaryHint)}</p>
-      </section>
-
-      <section class="cm-atencion">
-        <div class="cm-atencion__head">
-          <p class="cm-atencion__title">${escape(content.tienda.atencionTitle)}</p>
-          <span class="cm-atencion__state cm-atencion__state--${abierto ? "open" : "closed"}"
-            data-cm-atencion-texto>${escape(
-              abierto
-                ? content.tienda.atencionAbierto
-                : content.tienda.atencionCerrado
-            )}</span>
-        </div>
-
-        <button type="button" role="switch" aria-checked="${abierto ? "true" : "false"}"
-          aria-label="${escape(content.tienda.atencionTitle)}"
-          class="cm-switch${abierto ? " is-on" : ""}" data-cm-atencion>
-          <span class="cm-switch__track" aria-hidden="true">
-            <span class="cm-switch__thumb"></span>
-          </span>
-          <span class="cm-switch__labels" aria-hidden="true">
-            <span class="cm-switch__label cm-switch__label--on">${escape(
-              content.tienda.atencionAbierto
-            )}</span>
-            <span class="cm-switch__label cm-switch__label--off">${escape(
-              content.tienda.atencionCerrado
-            )}</span>
-          </span>
-        </button>
-
-        <p class="cm-atencion__hint" data-cm-atencion-hint>${escape(
-          abierto
-            ? content.tienda.atencionHintAbierto
-            : content.tienda.atencionHintCerrado
-        )}</p>
       </section>
 
       <button type="button" class="cm-btn cm-btn--ghost" data-cm-editar-negocio>

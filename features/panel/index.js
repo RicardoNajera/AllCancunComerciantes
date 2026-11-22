@@ -38,6 +38,7 @@ import {
   topbarHTML,
   sinNegocioHTML,
   tiendaHTML,
+  estaAbierto,
 } from "./views.js";
 import { menuHTML, pedidosHTML } from "./views-menu.js";
 import { ajustesHTML } from "./views-ajustes.js";
@@ -270,7 +271,7 @@ export async function mountPanel(root, { session, onSignedOut, topbar } = {}) {
     topbar.innerHTML = topbarHTML({
       titulo: titulos[tab] || content.tienda.title,
       subtitulo: negocio.nombre,
-      estado: tab === "tienda" ? negocio.estado : "",
+      abierto: tab === "tienda" ? estaAbierto(negocio) : null,
     });
 
     const menuDatos = {
@@ -280,6 +281,22 @@ export async function mountPanel(root, { session, onSignedOut, topbar } = {}) {
     on(topbar.querySelector("[data-cm-menu-open]"), "click", () =>
       setMenu(true, menuDatos.nombre, menuDatos.sub)
     );
+
+    /* Interruptor de atención (abierto / cerrado) de la cabecera.
+       Por ahora es solo visual: cambia en pantalla y no guarda nada.
+       Cuando se conecte a Supabase, aquí va el update de negocio.abierto. */
+    on(topbar.querySelector("[data-cm-atencion]"), "click", (ev) => {
+      const btn = ev.currentTarget;
+      const encendido = btn.classList.toggle("is-on");
+      btn.setAttribute("aria-checked", encendido ? "true" : "false");
+
+      const texto = btn.querySelector("[data-cm-atencion-texto]");
+      if (texto) {
+        texto.textContent = encendido
+          ? content.tienda.atencionAbierto
+          : content.tienda.atencionCerrado;
+      }
+    });
   }
 
   /* ---------- Pestaña activa ---------- */
@@ -322,31 +339,6 @@ export async function mountPanel(root, { session, onSignedOut, topbar } = {}) {
 
   /* ---------- Cableado: Tienda ---------- */
   function wireTienda(negocio) {
-    /* Interruptor de atención (abierto / cerrado).
-       Por ahora es solo visual: cambia en pantalla y no guarda nada.
-       Cuando se conecte a Supabase, aquí va el update de negocio.abierto. */
-    on(root.querySelector("[data-cm-atencion]"), "click", (ev) => {
-      const btn = ev.currentTarget;
-      const encendido = btn.classList.toggle("is-on");
-      btn.setAttribute("aria-checked", encendido ? "true" : "false");
-
-      const texto = root.querySelector("[data-cm-atencion-texto]");
-      if (texto) {
-        texto.textContent = encendido
-          ? content.tienda.atencionAbierto
-          : content.tienda.atencionCerrado;
-        texto.classList.toggle("cm-atencion__state--open", encendido);
-        texto.classList.toggle("cm-atencion__state--closed", !encendido);
-      }
-
-      const pista = root.querySelector("[data-cm-atencion-hint]");
-      if (pista) {
-        pista.textContent = encendido
-          ? content.tienda.atencionHintAbierto
-          : content.tienda.atencionHintCerrado;
-      }
-    });
-
     on(root.querySelector("[data-cm-publicar]"), "click", async (ev) => {
       const btn = ev.currentTarget;
       btn.setAttribute("disabled", "true");
