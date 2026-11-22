@@ -150,43 +150,27 @@ ok(
   /prefers-reduced-motion[\s\S]{0,500}cm-switch--top/.test(panel)
 );
 
-/* Modo cerrado: toda la app pierde el color. Es la señal más fuerte que
-   existe — si el filtro desaparece, el comerciante no siente que cerró. */
-ok("existe el modo cerrado", panel.includes(".es-cerrado"));
+/* Cerrado se distingue del abierto por tres cosas a la vez: color ámbar,
+   posición de la bolita y el punto que late. Si falta el latido, el chip
+   vuelve a ser un adorno que el ojo ignora. */
 ok(
-  "cerrado quita la saturacion de toda la app",
-  /\.es-cerrado \{[^}]*filter:\s*saturate\(0\)/.test(panel)
-);
-ok(
-  "cerrado apaga el fondo inmersivo",
-  /\.es-cerrado::before/.test(panel)
-);
-/* El velo nunca debe bloquear toques: si lo hace, el panel deja de responder */
-const bloqueVelo = panel.slice(
-  panel.indexOf(".es-cerrado::after"),
-  panel.indexOf("cm-velo-entra")
-);
-ok("el velo no bloquea toques", /pointer-events:\s*none/.test(bloqueVelo));
-/* y tiene que quedar debajo del menu lateral (z 50) o la navegacion se rompe */
-ok("el velo queda debajo del menu", /z-index:\s*30/.test(bloqueVelo));
-/* El interruptor debe seguir vivo para poder volver a abrir */
-ok(
-  "el interruptor se salva del gris",
-  /\.es-cerrado \.cm-switch--top \{[^}]*saturate\(1\)/.test(panel)
+  "cerrado se pinta en ambar",
+  /\.cm-switch--top:not\(\.is-on\) \.cm-switch__label \{[^}]*#ffb044/.test(panel)
 );
 ok(
-  "cerrado avisa en texto que no esta vendiendo",
-  panel.includes("Los clientes no pueden pedirte ahora")
+  "cerrado lleva un punto que late",
+  /\.cm-switch--top:not\(\.is-on\) \.cm-switch__track::after \{[^}]*animation:\s*cm-late/.test(panel)
 );
-/* La franja solo en Tienda: al editar la cuenta estorba */
+ok("existe la animacion del latido", /@keyframes cm-late/.test(panel));
+/* Sin movimiento, el color ambar y la bolita a la izquierda siguen avisando */
 ok(
-  "la franja solo sale en la pestana Tienda",
-  /\.es-cerrado \.app-screen\.es-cerrado--aviso::before/.test(panel)
+  "con menos movimiento el punto queda fijo, no desaparece",
+  /es:not\(\.is-on\) \.cm-switch__track::after \{[^}]*animation:\s*none/.test(panel) ||
+    /cm-switch--top:not\(\.is-on\) \.cm-switch__track::after \{\s*animation:\s*none/.test(panel)
 );
-ok(
-  "el gris respeta reduced-motion",
-  /prefers-reduced-motion[\s\S]{0,400}es-cerrado/.test(panel)
-);
+/* El gris global se quitó a petición: el panel no debe teñirse entero */
+ok("ya no existe el filtro gris global", !panel.includes("saturate(0)"));
+ok("ya no existe el velo gris", !panel.includes(".es-cerrado"));
 
 console.log(`\n${pasa} PASA / ${falla} FALLA`);
 if (falla > 0) process.exit(1);

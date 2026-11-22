@@ -274,10 +274,8 @@ export async function mountPanel(root, { session, onSignedOut, topbar } = {}) {
       abierto: tab === "tienda" ? estaAbierto(negocio) : null,
     });
 
-    /* El gris también al cargar, no solo al tocar el switch.
-       Se aplica en TODAS las pestañas: si el negocio está cerrado, el
-       panel entero debe sentirse apagado, no solo la pestaña Tienda. */
-    aplicarEstadoAtencion(estaAbierto(negocio), tab);
+    /* El estado también al cargar, no solo al tocar el switch */
+    aplicarEstadoAtencion(estaAbierto(negocio));
 
     const menuDatos = {
       nombre: nombreCuenta || content.accountFallback,
@@ -302,26 +300,19 @@ export async function mountPanel(root, { session, onSignedOut, topbar } = {}) {
           : content.tienda.atencionCerrado;
       }
 
-      aplicarEstadoAtencion(encendido, tab);
+      aplicarEstadoAtencion(encendido);
     });
   }
 
   /**
-   * Cerrado = toda la app pierde el color.
-   * No es un adorno: cuando el comerciante ve su panel gris, entiende en
-   * el cuerpo que no está vendiendo. Es la señal más fuerte que existe sin
-   * escribir un mensaje.
+   * El interruptor es la única señal de atención: nada de grises ni velos.
+   * Aquí solo se marca el estado del negocio para que el panel pueda
+   * reaccionar sin ensuciar la pantalla.
    */
-  function aplicarEstadoAtencion(abierto, pestana = tab) {
+  function aplicarEstadoAtencion(abierto) {
     const shell = document.getElementById("app");
     if (!shell) return;
-    shell.classList.toggle("es-cerrado", !abierto);
-
-    /* La franja que avisa "no estás vendiendo" solo en Tienda */
-    const pantalla = shell.querySelector(".app-screen");
-    if (pantalla) {
-      pantalla.classList.toggle("es-cerrado--aviso", !abierto && pestana === "tienda");
-    }
+    shell.dataset.atencion = abierto ? "abierto" : "cerrado";
   }
 
   /* ---------- Pestaña activa ---------- */

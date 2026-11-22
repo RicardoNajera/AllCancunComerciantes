@@ -102,7 +102,10 @@ export const content = {
 
     /* Interruptor de atención: dice a los clientes si el negocio está
        atendiendo ahora mismo. Es distinto de "publicado": un negocio
-       publicado puede estar cerrado porque ya terminó su horario. */
+       publicado puede estar cerrado porque ya terminó su horario.
+       Los textos están escritos como se lo diría un amigo, no un manual:
+       el comerciante tiene que sentir que depende de él, no que la app
+       lo regaña. */
     atencionTitle: "¿Estás atendiendo?",
     atencionAbierto: "Abierto",
     atencionCerrado: "Cerrado",
