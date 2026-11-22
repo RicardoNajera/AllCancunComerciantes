@@ -6,7 +6,7 @@
  * en cuanto haya conexión.
  */
 
-const CACHE_VERSION = "v8";
+const CACHE_VERSION = "v9";
 const CACHE_NAME = `all-cancun-comercios-${CACHE_VERSION}`;
 
 const APP_SHELL = [

@@ -150,5 +150,43 @@ ok(
   /prefers-reduced-motion[\s\S]{0,500}cm-switch--top/.test(panel)
 );
 
+/* Modo cerrado: toda la app pierde el color. Es la señal más fuerte que
+   existe — si el filtro desaparece, el comerciante no siente que cerró. */
+ok("existe el modo cerrado", panel.includes(".es-cerrado"));
+ok(
+  "cerrado quita la saturacion de toda la app",
+  /\.es-cerrado \{[^}]*filter:\s*saturate\(0\)/.test(panel)
+);
+ok(
+  "cerrado apaga el fondo inmersivo",
+  /\.es-cerrado::before/.test(panel)
+);
+/* El velo nunca debe bloquear toques: si lo hace, el panel deja de responder */
+const bloqueVelo = panel.slice(
+  panel.indexOf(".es-cerrado::after"),
+  panel.indexOf("cm-velo-entra")
+);
+ok("el velo no bloquea toques", /pointer-events:\s*none/.test(bloqueVelo));
+/* y tiene que quedar debajo del menu lateral (z 50) o la navegacion se rompe */
+ok("el velo queda debajo del menu", /z-index:\s*30/.test(bloqueVelo));
+/* El interruptor debe seguir vivo para poder volver a abrir */
+ok(
+  "el interruptor se salva del gris",
+  /\.es-cerrado \.cm-switch--top \{[^}]*saturate\(1\)/.test(panel)
+);
+ok(
+  "cerrado avisa en texto que no esta vendiendo",
+  panel.includes("Los clientes no pueden pedirte ahora")
+);
+/* La franja solo en Tienda: al editar la cuenta estorba */
+ok(
+  "la franja solo sale en la pestana Tienda",
+  /\.es-cerrado \.app-screen\.es-cerrado--aviso::before/.test(panel)
+);
+ok(
+  "el gris respeta reduced-motion",
+  /prefers-reduced-motion[\s\S]{0,400}es-cerrado/.test(panel)
+);
+
 console.log(`\n${pasa} PASA / ${falla} FALLA`);
 if (falla > 0) process.exit(1);

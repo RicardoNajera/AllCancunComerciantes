@@ -2011,3 +2011,102 @@ select.cm-input {
   }
 }
 
+
+/* ==========================================================================
+   Negocio CERRADO — toda la app pierde el color
+   --------------------------------------------------------------------------
+   La idea es física, no textual: cuando el comerciante apaga el interruptor,
+   el panel entero se apaga. Sin turquesa, sin acentos por categoría, sin
+   fotos a color. Gris de hospital.
+
+   Por qué con un filtro global y no una regla por componente:
+   el panel tiene decenas de colores (acentos de categoría, marca, avisos).
+   `saturate(0)` los apaga TODOS de golpe, y al volver a abrir recuperan su
+   color exacto. Una regla, cero mantenimiento.
+   ========================================================================== */
+
+.es-cerrado {
+  /* El gris no es instantáneo: si el cambio es brusco se siente como un
+     error de la app. Una transición corta lo hace sentir intencional. */
+  filter: saturate(0);
+  transition: filter 420ms var(--ease-out);
+}
+
+/* El fondo inmersivo también se apaga: pierde sus dos brillos de color */
+.es-cerrado::before {
+  background:
+    radial-gradient(120% 52% at 0% 0%, rgba(160, 170, 185, 0.05) 0%, transparent 58%),
+    radial-gradient(90% 42% at 100% 2%, rgba(160, 170, 185, 0.05) 0%, transparent 62%),
+    linear-gradient(180deg, #0a0c10 0%, #090b0e 46%, #07080b 100%);
+}
+
+/* Velo gris encima de todo: baja el contraste y se siente "apagado".
+   z-index bajo a propósito: el menú lateral (z 50) tiene que seguir por
+   encima, si no se rompe la navegación cuando el negocio está cerrado. */
+.es-cerrado::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  background: rgba(120, 128, 140, 0.07);
+  animation: cm-velo-entra 420ms var(--ease-out);
+}
+
+@keyframes cm-velo-entra {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Mientras está cerrado, las fotos pierden también intensidad: un negocio
+   cerrado no presume de fotos. Las dejamos visibles pero dormidas. */
+.es-cerrado .cm-photo__img {
+  filter: saturate(0) brightness(0.72);
+  transition: filter 420ms var(--ease-out);
+}
+
+/* El interruptor sigue siendo el único elemento con vida cuando está
+   cerrado: si también se apagara, no habría forma de volver a abrir. */
+.es-cerrado .cm-switch--top {
+  filter: saturate(1);
+}
+
+/* Y cuando está cerrado, el interruptor avisa en gris fuerte, no en turquesa */
+.es-cerrado .cm-switch--top .cm-switch__label {
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Aviso inmersivo: una franja arriba del contenido que dice que el negocio
+   no está vendiendo. Sin esto, el gris podría confundirse con un fallo de
+   carga. Solo aparece en la pestaña Tienda: ahí es donde el comerciante
+   necesita el recordatorio, no mientras edita su cuenta. */
+.es-cerrado .app-screen.es-cerrado--aviso::before {
+  content: "Tu negocio está cerrado. Los clientes no pueden pedirte ahora.";
+  display: block;
+  margin: 0 0 var(--space-3);
+  padding: 10px var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+  color: rgba(255, 255, 255, 0.86);
+  background: rgba(150, 158, 172, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  letter-spacing: 0.01em;
+}
+
+/* Respeta a quien pidió menos animaciones */
+@media (prefers-reduced-motion: reduce) {
+  .es-cerrado,
+  .es-cerrado::after,
+  .es-cerrado .cm-photo__img {
+    transition: none;
+    animation: none;
+  }
+}
+
