@@ -93,12 +93,12 @@ export function topbarHTML({ titulo, subtitulo = "", accion = "", abierto = null
              aria-label="${escape(content.tienda.atencionTitle)}"
              class="cm-switch cm-switch--top${abierto ? " is-on" : ""}"
              data-cm-atencion>
-             <span class="cm-switch__track" aria-hidden="true">
-               <span class="cm-switch__thumb"></span>
-             </span>
              <span class="cm-switch__label" data-cm-atencion-texto>${escape(
                abierto ? content.tienda.atencionAbierto : content.tienda.atencionCerrado
              )}</span>
+             <span class="cm-switch__track" aria-hidden="true">
+               <span class="cm-switch__thumb"></span>
+             </span>
            </button>`
     }
     ${accion}`;

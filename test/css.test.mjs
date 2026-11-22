@@ -150,23 +150,25 @@ ok(
   /prefers-reduced-motion[\s\S]{0,500}cm-switch--top/.test(panel)
 );
 
-/* Cerrado se distingue del abierto por tres cosas a la vez: color ámbar,
-   posición de la bolita y el punto que late. Si falta el latido, el chip
-   vuelve a ser un adorno que el ojo ignora. */
+/* Cerrado se lee apagado, no alarmante: gris en la pista y en la palabra.
+   Se probó el naranja y el latido y se quitaron — cansaban a las pocas
+   horas de mirar el panel. */
 ok(
-  "cerrado se pinta en ambar",
-  /\.cm-switch--top:not\(\.is-on\) \.cm-switch__label \{[^}]*#ffb044/.test(panel)
+  "cerrado no usa naranja ni ambar",
+  !/ffb044|255,\s*176,\s*68/i.test(panel)
+);
+ok("cerrado no tiene punto que late", !/cm-late/.test(panel));
+ok(
+  "la palabra va arriba del interruptor",
+  /\.cm-switch--top \{[^}]*flex-direction:\s*column/.test(panel)
 );
 ok(
-  "cerrado lleva un punto que late",
-  /\.cm-switch--top:not\(\.is-on\) \.cm-switch__track::after \{[^}]*animation:\s*cm-late/.test(panel)
+  "la palabra se lee en mayusculas parejas",
+  /\.cm-switch__label \{[^}]*text-transform:\s*uppercase/.test(panel)
 );
-ok("existe la animacion del latido", /@keyframes cm-late/.test(panel));
-/* Sin movimiento, el color ambar y la bolita a la izquierda siguen avisando */
 ok(
-  "con menos movimiento el punto queda fijo, no desaparece",
-  /es:not\(\.is-on\) \.cm-switch__track::after \{[^}]*animation:\s*none/.test(panel) ||
-    /cm-switch--top:not\(\.is-on\) \.cm-switch__track::after \{\s*animation:\s*none/.test(panel)
+  "abierto se pinta con el turquesa de la marca",
+  /\.cm-switch--top\.is-on \.cm-switch__track \{[^}]*var\(--color-brand\)/.test(panel)
 );
 /* El gris global se quitó a petición: el panel no debe teñirse entero */
 ok("ya no existe el filtro gris global", !panel.includes("saturate(0)"));
