@@ -24,6 +24,27 @@ export function initial(nombre) {
   return limpio.charAt(0).toUpperCase();
 }
 
+/**
+ * La cara del menú: la foto de Gmail de la persona, no la del negocio.
+ * El menú abre con "tu cuenta", así que ahí va tu cara.
+ *
+ * Prioridad:
+ *   1. `foto_perfil_url` — la que se guardó del alta con Google
+ *   2. `avatar_url` / `picture` del token — por si el perfil no la tiene
+ *   3. logo del negocio → portada — respaldo cuando no hay foto de Google
+ *   4. "" — `drawerHTML` pinta entonces la inicial
+ */
+export function fotoMenu({ perfil, meta = {}, negocio } = {}) {
+  const dePerfil = String(perfil?.foto_perfil_url || "").trim();
+  if (dePerfil) return dePerfil;
+
+  const deGoogle = String(meta?.avatar_url || meta?.picture || "").trim();
+  if (deGoogle) return deGoogle;
+
+  const n = negocio || {};
+  return String(n.logo_url || n.foto_url || "").trim();
+}
+
 /** id de categoría → etiqueta legible */
 export function categoriaLabel(id) {
   const found = CATEGORIAS.find((c) => c.id === id);

@@ -34,6 +34,7 @@ import {
   estadoTone,
   categoriaLabel,
   initial,
+  fotoMenu,
 } from "../features/panel/bits.js";
 
 let pass = 0;
@@ -106,6 +107,42 @@ ok("sin foto no hay imagen rota", !lateral.includes("<img"));
 ok(
   "la foto no gana el foco del teclado",
   /aria-hidden="true"[^>]*data-cm-avatar|data-cm-avatar/.test(conFoto)
+);
+
+/* La cara es la de Gmail, no la del local. El menú abre con "tu cuenta". */
+console.log("\n--- Cara del menú: la foto de Gmail ---");
+ok(
+  "gana la foto de Gmail sobre el logo del negocio",
+  fotoMenu({
+    perfil: { foto_perfil_url: "https://lh3.google.com/yo.jpg" },
+    meta: {},
+    negocio: { logo_url: "/logo.jpg" },
+  }) === "https://lh3.google.com/yo.jpg"
+);
+ok(
+  "si el perfil no la guardó, la trae del token",
+  fotoMenu({
+    perfil: { foto_perfil_url: "" },
+    meta: { avatar_url: "https://google/av.jpg" },
+  }) === "https://google/av.jpg"
+);
+ok(
+  "acepta picture además de avatar_url",
+  fotoMenu({ meta: { picture: "https://google/p.jpg" } }) === "https://google/p.jpg"
+);
+ok(
+  "sin foto de Google cae al logo del negocio",
+  fotoMenu({ negocio: { logo_url: "/logo.jpg", foto_url: "/port.jpg" } }) === "/logo.jpg"
+);
+ok(
+  "sin logo usa la portada",
+  fotoMenu({ negocio: { foto_url: "/port.jpg" } }) === "/port.jpg"
+);
+ok("sin nada devuelve vacío (la inicial)", fotoMenu({}) === "");
+ok("no truena sin argumentos", fotoMenu() === "");
+ok(
+  "espacios en blanco no cuentan como foto",
+  fotoMenu({ perfil: { foto_perfil_url: "   " }, meta: { avatar_url: "  " } }) === ""
 );
 
 console.log("\n--- Cabecera ---");

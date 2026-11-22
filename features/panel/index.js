@@ -41,7 +41,7 @@ import {
   estaAbierto,
 } from "./views.js";
 import { menuHTML, pedidosHTML } from "./views-menu.js";
-import { initial } from "./bits.js";
+import { initial, fotoMenu } from "./bits.js";
 import { ajustesHTML } from "./views-ajustes.js";
 import { negocioFormHTML } from "./views-form-negocio.js";
 import { productoFormHTML } from "./views-form-producto.js";
@@ -234,7 +234,8 @@ export async function mountPanel(root, { session, onSignedOut, topbar } = {}) {
     const perfil = profile;
 
     await salirDelSplash();
-    paintTopbar(negocio);
+    paintTopbar(negocio, perfil);
+
     closeMenu();
     paintTab(negocio, productos, perfil);
   }
@@ -273,7 +274,7 @@ export async function mountPanel(root, { session, onSignedOut, topbar } = {}) {
   }
 
   /* ---------- Cabecera ---------- */
-  function paintTopbar(negocio) {
+  function paintTopbar(negocio, profile) {
     if (!topbar) return;
     topbar.hidden = false;
 
@@ -293,14 +294,19 @@ export async function mountPanel(root, { session, onSignedOut, topbar } = {}) {
     /* El estado también al cargar, no solo al tocar el switch */
     aplicarEstadoAtencion(estaAbierto(negocio));
 
+    /* La cara del menú es la foto de Gmail de la persona: el menú abre
+       con "tu cuenta", no con el local. Si no hay foto de Google, cae al
+       logo del negocio y, si tampoco, a la inicial. */
     const menuDatos = {
       nombre: nombreCuenta || content.accountFallback,
       sub: [negocio.nombre, email].filter(Boolean).join(" · "),
-      /* La cara del menú es la foto REAL del negocio. El logo es la foto
-         cuadrada (la que sale en la tarjeta del cliente); si todavía no
-         hay logo se usa la portada, que también es una foto suya. */
-      foto: String(negocio.logo_url || negocio.foto_url || "").trim(),
+      foto: fotoMenu({
+        perfil: profile,
+        meta: session.user?.user_metadata || {},
+        negocio,
+      }),
     };
+
     on(topbar.querySelector("[data-cm-menu-open]"), "click", () =>
       setMenu(true, menuDatos.nombre, menuDatos.sub, menuDatos.foto)
     );
