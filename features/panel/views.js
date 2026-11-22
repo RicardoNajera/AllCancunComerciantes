@@ -173,6 +173,13 @@ export function tiendaHTML({ negocio }) {
   const accent = categoriaAccent(negocio.categoria);
   const publicado = negocio.estado === "activo";
 
+  /* Interruptor de atención. Por ahora es solo visual: arranca en
+     "abierto" si el negocio ya está publicado, y en "cerrado" si todavía
+     es un borrador (un borrador no puede estar atendiendo).
+     Cuando se conecte a Supabase, esto leerá negocio.abierto. */
+  const abierto =
+    typeof negocio.abierto === "boolean" ? negocio.abierto : publicado;
+
   /* La foto se pinta si la columna trae URL. Si está vacía, el recuadro
      punteado ya comunica que falta; no hace falta un <img> roto. */
   const portada = String(negocio.foto_url || "").trim();
@@ -279,15 +286,39 @@ export function tiendaHTML({ negocio }) {
         <p class="cm-preview__hint">${escape(content.tienda.summaryHint)}</p>
       </section>
 
-      ${
-        publicado
-          ? `<div class="cm-done">${ico.check}<span>${escape(
-              content.publishDone
-            )}</span></div>`
-          : `<button type="button" class="cm-btn cm-btn--publish" data-cm-publicar>
-               <span>${escape(content.publishCta)}</span>
-             </button>`
-      }
+      <section class="cm-atencion">
+        <div class="cm-atencion__head">
+          <p class="cm-atencion__title">${escape(content.tienda.atencionTitle)}</p>
+          <span class="cm-atencion__state cm-atencion__state--${abierto ? "open" : "closed"}"
+            data-cm-atencion-texto>${escape(
+              abierto
+                ? content.tienda.atencionAbierto
+                : content.tienda.atencionCerrado
+            )}</span>
+        </div>
+
+        <button type="button" role="switch" aria-checked="${abierto ? "true" : "false"}"
+          aria-label="${escape(content.tienda.atencionTitle)}"
+          class="cm-switch${abierto ? " is-on" : ""}" data-cm-atencion>
+          <span class="cm-switch__track" aria-hidden="true">
+            <span class="cm-switch__thumb"></span>
+          </span>
+          <span class="cm-switch__labels" aria-hidden="true">
+            <span class="cm-switch__label cm-switch__label--on">${escape(
+              content.tienda.atencionAbierto
+            )}</span>
+            <span class="cm-switch__label cm-switch__label--off">${escape(
+              content.tienda.atencionCerrado
+            )}</span>
+          </span>
+        </button>
+
+        <p class="cm-atencion__hint" data-cm-atencion-hint>${escape(
+          abierto
+            ? content.tienda.atencionHintAbierto
+            : content.tienda.atencionHintCerrado
+        )}</p>
+      </section>
 
       <button type="button" class="cm-btn cm-btn--ghost" data-cm-editar-negocio>
         <span>${escape(content.tienda.editCta)}</span>

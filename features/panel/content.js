@@ -99,6 +99,18 @@ export const content = {
     contactEmpty: "Sin WhatsApp",
 
     editCta: "Editar datos",
+
+    /* Interruptor de atención: dice a los clientes si el negocio está
+       atendiendo ahora mismo. Es distinto de "publicado": un negocio
+       publicado puede estar cerrado porque ya terminó su horario. */
+    atencionTitle: "¿Estás atendiendo?",
+    atencionAbierto: "Abierto",
+    atencionCerrado: "Cerrado",
+    atencionHintAbierto:
+      "Tus clientes ven que puedes tomar pedidos ahora.",
+    atencionHintCerrado:
+      "Tus clientes ven que estás cerrado. Tu negocio sigue en la app.",
+
     summaryTitle: "Cómo te ven tus clientes",
     summaryHint:
       "Así se ve tu tarjeta en la app. Se llena sola cuando guardas tus datos.",

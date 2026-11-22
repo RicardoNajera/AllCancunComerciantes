@@ -161,13 +161,29 @@ ok("avisa que falta la colonia", tienda.includes("Sin colonia"));
 ok("avisa que falta el WhatsApp", tienda.includes("Sin WhatsApp"));
 ok("avisa que falta el horario", tienda.includes("Sin horario"));
 ok("avisa que falta la descripcion", tienda.includes("Todavía no escribiste"));
-ok("tiene boton publicar", tienda.includes("data-cm-publicar"));
+ok("tiene el interruptor de atencion", tienda.includes("data-cm-atencion"));
+ok(
+  "el interruptor arranca en cerrado si es borrador",
+  tienda.includes('aria-checked="false"')
+);
+ok("el interruptor se llama switch", tienda.includes('role="switch"'));
 ok("tiene boton editar", tienda.includes("data-cm-editar-negocio"));
 ok("la vista previa dice que no hay resenas", tienda.includes("Sin reseñas todavía"));
 
 const activo = tiendaHTML({ negocio: { ...negocio, estado: "activo" } });
-ok("publicado NO muestra boton publicar", !activo.includes("data-cm-publicar"));
-ok("publicado confirma que esta visible", activo.includes("ya está visible"));
+ok("publicado ya no muestra boton publicar", !activo.includes("data-cm-publicar"));
+ok(
+  "el interruptor arranca abierto si esta publicado",
+  activo.includes('aria-checked="true"')
+);
+ok("publicado muestra la palabra Abierto", activo.includes(">Abierto<"));
+ok("borrador muestra la palabra Cerrado", tienda.includes(">Cerrado<"));
+/* Un negocio publicado sigue existiendo aunque este cerrado: no se borra
+   de la app, solo cambia lo que ve el cliente. */
+ok(
+  "cerrado aclara que el negocio sigue en la app",
+  tienda.includes("sigue en la app")
+);
 
 console.log("\n--- Tarjeta del cliente ---");
 const tarjeta = tarjetaClienteHTML(negocio);
