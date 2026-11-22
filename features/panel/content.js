@@ -251,6 +251,35 @@ const solid = (d, tone, size = 20) =>
   ` stroke-linejoin="round" aria-hidden="true" class="ico ico--${tone}">` +
   `<g fill="var(--ico-${tone})" stroke="var(--ico-${tone}-line)">${d}</g></svg>`;
 
+/* --------------------------------------------------------------------------
+   Iconos de las cuatro pestañas.
+   Trazo de línea, un solo color heredado del texto (currentColor): así el
+   ícono toma el color de la pestaña activa sin duplicar archivos. Los SVG
+   viven en assets/iconos/ y salen de SVGRepo (licencia libre).
+   -------------------------------------------------------------------------- */
+const tabIco = (nombre, size = 20) =>
+  `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none"` +
+  ` stroke="currentColor" stroke-width="1.7" stroke-linecap="round"` +
+  ` stroke-linejoin="round" aria-hidden="true">${TRAZO_PESTANA[nombre]}</svg>`;
+
+/* Los trazos, tal como se descargaron, sin el envoltorio <svg> */
+const TRAZO_PESTANA = {
+  tienda:
+    `<path d="M3.6 8h16.8l-1.1 10.5a1.9 1.9 0 0 1-1.9 1.7H6.6a1.9 1.9 0 0 1-1.9-1.7Z"/>` +
+    `<path d="M8.4 8V6.2a3.6 3.6 0 0 1 7.2 0V8"/>` +
+    `<path d="M3.6 8h16.8" />`,
+  menu:
+    `<rect x="3.2" y="3.2" width="17.6" height="17.6" rx="3"/>` +
+    `<path d="M9.6 3.2v17.6M9.6 12h11.2"/>`,
+  pedidos:
+    `<path d="M9 7H6.92c-.52 0-.95.4-1 .92L5.09 17.92c-.05.58.41 1.08 1 1.08h11.82c.58 0 1.04-.5 1-1.08L18.08 7.92c-.05-.52-.48-.92-1-.92H15"/>` +
+    `<path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>` +
+    `<path d="M9 7h6"/>`,
+  ajustes:
+    `<circle cx="12" cy="12" r="4.5"/>` +
+    `<path d="M2 12h5.5M16.5 12H22"/>`,
+};
+
 export const ico = {
   store: solid(
     `<path d="M3.6 9.4 5.9 3.8h12.2l2.3 5.6Z"/>` +
@@ -259,31 +288,11 @@ export const ico = {
     "aqua"
   ),
 
-  menu: solid(
-    `<rect x="3.4" y="4.2" width="7.2" height="7.2" rx="2"/>` +
-      `<rect x="13.4" y="4.2" width="7.2" height="7.2" rx="2"/>` +
-      `<rect x="3.4" y="13.4" width="7.2" height="6.4" rx="2"/>` +
-      `<rect x="13.4" y="13.4" width="7.2" height="6.4" rx="2"/>`,
-    "violeta"
-  ),
-
-  bag: solid(
-    `<path d="M4.2 8.2h15.6l-1.2 11.1a1.7 1.7 0 0 1-1.7 1.5H7.1a1.7 1.7 0 0 1-1.7-1.5Z"/>` +
-      `<path d="M8.4 8.2V6a3.6 3.6 0 0 1 7.2 0v2.2"/>`,
-    "ambar"
-  ),
-
-  gear: solid(
-    `<circle cx="12" cy="12" r="3"/>` +
-      `<path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3` +
-      ` 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1` +
-      `a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1` +
-      `A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3` +
-      `H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1` +
-      `a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1` +
-      `a1.6 1.6 0 0 0-1.5 1Z"/>`,
-    "cielo"
-  ),
+  /* Pestañas: línea limpia, heredan el color del texto */
+  menu: tabIco("menu"),
+  bag: tabIco("pedidos"),
+  gear: tabIco("ajustes"),
+  tabStore: tabIco("tienda"),
 
   plus: solid(`<path d="M12 5v14M5 12h14"/>`, "aqua", 18),
 
@@ -380,7 +389,7 @@ export const DIAS = [
 
 /* Pestañas de la barra inferior, en orden */
 export const TABS = [
-  { id: "tienda", icon: "store" },
+  { id: "tienda", icon: "tabStore" },
   { id: "menu", icon: "menu" },
   { id: "pedidos", icon: "bag" },
   { id: "ajustes", icon: "gear" },
