@@ -5,3 +5,7 @@ node_modules/
 .env.local
 .vscode/
 .idea/
+dist/
+# Credenciales locales de wrangler: se generan al desplegar y no deben
+# subirse a git. Con "**/" aplica también dentro de worker/.
+**/.wrangler/

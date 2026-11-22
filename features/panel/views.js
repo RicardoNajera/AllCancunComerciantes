@@ -7,6 +7,7 @@
  */
 
 import { escape } from "../shared/escape.js";
+import { subidaConfigurada } from "../shared/fotos.js";
 import { content, ico, CATEGORIAS, TABS } from "./content.js";
 import {
   googleLogo,
@@ -40,47 +41,84 @@ export function loginHTML() {
     </div>`;
 }
 
-export function loadingHTML() {
-  return `<div class="cm-loading"><span class="cm-loading__dot"></span>${escape(
-    content.loading
-  )}</div>`;
-}
-
 /* ==========================================================================
-   Barra inferior
+   Transición de carga
+   Cristal inmersivo: una tarjeta de vidrio sobre el fondo de la app,
+   con el logo de la marca dentro. Sin texto visible — el aviso de que
+   está cargando solo existe para lectores de pantalla.
+   `data-cm-boot` lo usa index.js para disolverlo cuando ya hay datos.
    ========================================================================== */
 
-export function dockHTML(activa) {
-  return TABS.map((t) => {
-    const nombre = content.tabs[t.id];
-    const isActive = t.id === activa;
-    return `<button type="button" class="dock-tab${isActive ? " is-active" : ""}"
-      data-cm-tab="${escape(t.id)}"
-      aria-current="${isActive ? "page" : "false"}">
-      <span class="dock-tab__ico" aria-hidden="true">${ico[t.icon]}</span>
-      <span class="dock-tab__label">${escape(nombre)}</span>
-    </button>`;
-  }).join("");
+export function loadingHTML() {
+  return `
+    <div class="cm-boot" data-cm-boot role="status" aria-live="polite" aria-label="${escape(
+      content.loading
+    )}">
+      <span class="cm-boot__glass" aria-hidden="true">
+        <span class="cm-boot__mark">${ico.store}</span>
+      </span>
+    </div>`;
 }
 
 /* ==========================================================================
    Cabecera de cada pestaña
    ========================================================================== */
 
+/** Cabecera: menú + título + estado del negocio. La píldora vive aquí
+ *  (solo en Tienda) para saber en un vistazo si está publicado. */
 export function topbarHTML({ titulo, subtitulo = "", accion = "", estado = "" }) {
   return `
+    <button type="button" class="cm-menu-btn" data-cm-menu-open
+      aria-label="${escape(content.menuButton)}"
+      aria-expanded="false" aria-controls="app-drawer">${ico.burger}</button>
     <div class="cm-topbar__text">
       <h1 class="cm-topbar__title">${escape(titulo)}</h1>
       ${subtitulo ? `<p class="cm-topbar__sub">${escape(subtitulo)}</p>` : ""}
     </div>
     ${
       estado
-        ? `<span class="cm-status cm-status--${estadoTone(estado)}">${escape(
-            estadoLabel(estado)
-          )}</span>`
+        ? `<span class="cm-status cm-status--${estadoTone(estado)}" title="${escape(
+            content.statusStateLabel
+          )}">${escape(estadoLabel(estado))}</span>`
         : ""
     }
     ${accion}`;
+}
+
+/* ==========================================================================
+   Menú lateral: la única navegación del panel, con nombre y foto
+   ========================================================================== */
+
+export function drawerHTML({ activa, nombre = "", sub = "" }) {
+  return `
+    <nav class="cm-drawer" id="app-drawer" data-cm-drawer
+      aria-label="${escape(content.menuTitle)}" aria-hidden="true">
+      <div class="cm-drawer__head">
+        <span class="cm-drawer__avatar" aria-hidden="true">${escape(initial(nombre))}</span>
+        <div class="cm-drawer__who">
+          <p class="cm-drawer__name">${escape(nombre)}</p>
+          ${sub ? `<p class="cm-drawer__sub">${escape(sub)}</p>` : ""}
+        </div>
+      </div>
+
+      <div class="cm-drawer__nav">
+        ${TABS.map((t) => {
+          const isActive = t.id === activa;
+          return `<button type="button" class="cm-drawer__item${
+            isActive ? " is-active" : ""
+          }" data-cm-tab="${escape(t.id)}"
+            aria-current="${isActive ? "page" : "false"}">
+            ${ico[t.icon]}<span>${escape(content.tabs[t.id])}</span>
+          </button>`;
+        }).join("")}
+      </div>
+
+      <div class="cm-drawer__foot">
+        <button type="button" class="cm-drawer__item" data-cm-menu-close>
+          ${ico.close}<span>${escape(content.menuClose)}</span>
+        </button>
+      </div>
+    </nav>`;
 }
 
 /* ==========================================================================
@@ -135,22 +173,44 @@ export function tiendaHTML({ negocio }) {
   const accent = categoriaAccent(negocio.categoria);
   const publicado = negocio.estado === "activo";
 
+  /* La foto se pinta si la columna trae URL. Si está vacía, el recuadro
+     punteado ya comunica que falta; no hace falta un <img> roto. */
+  const portada = String(negocio.foto_url || "").trim();
+  const logo = String(negocio.logo_url || "").trim();
+  const puedeSubir = subidaConfigurada();
+
   return `
     <div class="cm-tab cm-tab--tienda">
 
       <section class="cm-cover-block">
-        ${photoSlot({
-          label: content.tienda.coverLabel,
-          hint: content.tienda.coverHint,
-          variant: "cover",
-        })}
-        <div class="cm-logo-wrap">
+        <button type="button" class="cm-photo-btn" data-cm-foto="portada"
+          ${puedeSubir ? "" : "disabled"}
+          aria-label="${escape(content.tienda.coverLabel)}">
           ${photoSlot({
-            label: content.tienda.logoLabel,
-            variant: "logo",
+            label: content.tienda.coverLabel,
+            hint: content.tienda.coverHint,
+            variant: "cover",
+            hasImage: Boolean(portada),
+            src: portada,
           })}
+        </button>
+        <div class="cm-logo-wrap">
+          <button type="button" class="cm-photo-btn cm-photo-btn--logo" data-cm-foto="logo"
+            ${puedeSubir ? "" : "disabled"}
+            aria-label="${escape(content.tienda.logoLabel)}">
+            ${photoSlot({
+              label: content.tienda.logoLabel,
+              variant: "logo",
+              hasImage: Boolean(logo),
+              src: logo,
+            })}
+          </button>
         </div>
       </section>
+
+      <input type="file" accept="image/*" data-cm-foto-input hidden />
+
+      <p class="cm-msg" data-cm-msg role="status" hidden></p>
 
       <section class="cm-card">
         <div class="cm-card__head">
@@ -167,11 +227,11 @@ export function tiendaHTML({ negocio }) {
         </div>
 
         ${
-          negocio.estado === "activo"
-            ? ""
-            : `<div class="cm-notice cm-notice--${estadoTone(negocio.estado)}">
-                 ${escape(estadoHint(negocio.estado))}
-               </div>`
+          /* El estado siempre visible, también cuando ya está publicado:
+             antes el aviso desaparecía y no quedaba rastro del estado. */
+          `<div class="cm-notice cm-notice--${estadoTone(negocio.estado)}" role="status">
+             ${escape(estadoHint(negocio.estado))}
+           </div>`
         }
 
         <dl class="cm-data">

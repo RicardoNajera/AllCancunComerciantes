@@ -120,10 +120,12 @@ export const content = {
     toggleOn: "Marcar disponible",
     toggleOff: "Marcar agotado",
     deleteCta: "Quitar del menú",
+    editCta: "Editar producto",
     priceEmpty: "Sin precio",
   },
 
   productFormTitle: "Nuevo producto",
+  productEditTitle: "Editar producto",
   productFields: {
     nombre: {
       label: "Nombre",
@@ -178,6 +180,9 @@ export const content = {
     accountLabel: "Cuenta",
     accountHint: "La cuenta de Google con la que entraste.",
     dangerLabel: "Zona de riesgo",
+    stateOk: "Completo",
+    statePending: "Incompleto",
+    version: "All Cancún · Comercios",
     pauseCta: "Pausar mi negocio",
     pauseHint: "Dejas de aparecer en la app. Puedes reactivarlo.",
     editCta: "Editar",
@@ -188,9 +193,19 @@ export const content = {
   signOut: "Cerrar sesión",
   signOutArm: "Toca otra vez para salir",
 
+  /* --- Menú lateral --- */
+  menuButton: "Abrir menú",
+  menuTitle: "Secciones",
+  menuClose: "Cerrar menú",
+  accountFallback: "Tu cuenta",
+
+  /* --- Estado del negocio en la cabecera --- */
+  statusStateLabel: "Estado de tu negocio",
+
   /* --- Navegación --- */
   back: "Volver",
   save: "Guardar",
+  edit: "Editar",
   cancel: "Cancelar",
   close: "Cerrar",
   optional: "opcional",
@@ -210,20 +225,40 @@ const svg = (d, size = 18, sw = 1.7) =>
   ` stroke="currentColor" stroke-width="${sw}" stroke-linecap="round"` +
   ` stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 
+/* --------------------------------------------------------------------------
+   Iconos sólidos con relleno y color propio.
+   Trazo grueso + relleno tonal: se leen a 16px, pesan en la pantalla y
+   no dependen del color del texto. Cada uno lleva su tono.
+   -------------------------------------------------------------------------- */
+const solid = (d, tone, size = 20) =>
+  `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none"` +
+  ` stroke="currentColor" stroke-width="1.9" stroke-linecap="round"` +
+  ` stroke-linejoin="round" aria-hidden="true" class="ico ico--${tone}">` +
+  `<g fill="var(--ico-${tone})" stroke="var(--ico-${tone}-line)">${d}</g></svg>`;
+
 export const ico = {
-  store: svg(
-    `<path d="M4 9.5V19a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19V9.5"/>` +
-      `<path d="M3 9.5 5.2 4h13.6L21 9.5"/><path d="M8.5 20.5v-6h7v6"/>`
+  store: solid(
+    `<path d="M3.6 9.4 5.9 3.8h12.2l2.3 5.6Z"/>` +
+      `<path d="M4.6 10.6V19a1.6 1.6 0 0 0 1.6 1.6h11.6A1.6 1.6 0 0 0 19.4 19v-8.4"/>` +
+      `<path d="M9.4 20.6v-5.4h5.2v5.4"/>`,
+    "aqua"
   ),
 
-  menu: svg(`<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/>`),
-
-  bag: svg(
-    `<path d="M4.5 8h15l-1.1 11.2a1.6 1.6 0 0 1-1.6 1.4H7.2a1.6 1.6 0 0 1-1.6-1.4Z"/>` +
-      `<path d="M8.8 8V6.2a3.2 3.2 0 0 1 6.4 0V8"/>`
+  menu: solid(
+    `<rect x="3.4" y="4.2" width="7.2" height="7.2" rx="2"/>` +
+      `<rect x="13.4" y="4.2" width="7.2" height="7.2" rx="2"/>` +
+      `<rect x="3.4" y="13.4" width="7.2" height="6.4" rx="2"/>` +
+      `<rect x="13.4" y="13.4" width="7.2" height="6.4" rx="2"/>`,
+    "violeta"
   ),
 
-  gear: svg(
+  bag: solid(
+    `<path d="M4.2 8.2h15.6l-1.2 11.1a1.7 1.7 0 0 1-1.7 1.5H7.1a1.7 1.7 0 0 1-1.7-1.5Z"/>` +
+      `<path d="M8.4 8.2V6a3.6 3.6 0 0 1 7.2 0v2.2"/>`,
+    "ambar"
+  ),
+
+  gear: solid(
     `<circle cx="12" cy="12" r="3"/>` +
       `<path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3` +
       ` 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1` +
@@ -231,23 +266,29 @@ export const ico = {
       `A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3` +
       `H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1` +
       `a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1` +
-      `a1.6 1.6 0 0 0-1.5 1Z"/>`
+      `a1.6 1.6 0 0 0-1.5 1Z"/>`,
+    "cielo"
   ),
 
-  plus: svg(`<path d="M12 5v14M5 12h14"/>`, 18, 2.1),
+  plus: solid(`<path d="M12 5v14M5 12h14"/>`, "aqua", 18),
 
   chevron: svg(`<path d="m9.5 6 6 6-6 6"/>`, 16, 2.1),
 
   arrowLeft: svg(`<path d="m14.5 6-6 6 6 6"/>`, 20, 2),
 
-  logout: svg(
+  logout: solid(
     `<path d="M15 17l5-5-5-5"/><path d="M20 12H9"/>` +
-      `<path d="M12 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h6"/>`
+      `<path d="M12 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h6"/>`,
+    "coral",
+    18
   ),
 
   close: svg(`<path d="m6 6 12 12M18 6 6 18"/>`, 18, 2.1),
 
-  check: svg(`<path d="m4.5 12.5 5 5 10-11"/>`, 16, 2.2),
+  /* Hamburguesa: abre el menú lateral */
+  burger: svg(`<path d="M4 7h16M4 12h16M4 17h11"/>`, 20, 2),
+
+  check: solid(`<path d="m4.5 12.5 5 5 10-11"/>`, "lima", 16),
 
   star: svg(
     `<path d="m12 3.6 2.7 5.5 6 .9-4.4 4.2 1.1 6-5.4-2.9-5.4 2.9 1.1-6L3.3 10l6-.9Z"/>`,
@@ -255,9 +296,10 @@ export const ico = {
   ),
 
   /* Cámara: el espacio de imagen */
-  camera: svg(
+  camera: solid(
     `<path d="M3.5 8.5h2.8l1.4-2.2h8.6l1.4 2.2h2.8a1.5 1.5 0 0 1 1.5 1.5V18a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 18V10a1.5 1.5 0 0 1 1.5-1.5Z"/>` +
       `<circle cx="12" cy="13.5" r="3.4"/>`,
+    "rosa",
     20
   ),
 
@@ -277,9 +319,17 @@ export const ico = {
       `<path d="M4.8 20.2a7.4 7.4 0 0 1 14.4 0"/>`
   ),
 
-  trash: svg(
+  trash: solid(
     `<path d="M4 7h16"/><path d="M9.5 7V4.8h5V7"/>` +
-      `<path d="M6.5 7l1 13h9l1-13"/>`
+      `<path d="M6.5 7l1 13h9l1-13"/>`,
+    "rojo"
+  ),
+
+  pencil: solid(
+    `<path d="M4 20h4l10-10a2.1 2.1 0 0 0-3-3L5 17v3Z"/>` +
+      `<path d="m14 6 3 3"/>`,
+    "lima",
+    18
   ),
 
   image: svg(

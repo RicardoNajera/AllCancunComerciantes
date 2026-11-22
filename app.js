@@ -22,7 +22,6 @@ import {
 
 const screen = document.getElementById("app-screen");
 const topbar = document.getElementById("app-topbar");
-const dock = document.getElementById("app-dock");
 
 let dispose = null;
 let unlisten = null;
@@ -32,6 +31,14 @@ function clear() {
   if (typeof dispose === "function") dispose();
   dispose = null;
   if (screen) screen.innerHTML = "";
+
+  /* Red de seguridad: si por cualquier motivo (recarga, error a medias,
+     sesión que cambia) quedó un menú colgando en #app, lo quitamos.
+     El menú nunca debe existir en el DOM si no está abierto. */
+  const app = document.getElementById("app");
+  if (app) {
+    app.querySelectorAll("[data-cm-drawer], [data-cm-overlay]").forEach((n) => n.remove());
+  }
 }
 
 async function boot() {
@@ -64,15 +71,10 @@ async function paint(session) {
     topbar.hidden = true;
     topbar.innerHTML = "";
   }
-  if (dock) {
-    dock.hidden = true;
-    dock.innerHTML = "";
-  }
 
   dispose = await mountPanel(screen, {
     session,
     topbar,
-    dock,
     onSignedOut: () => paint(null),
     onSignedIn: () => paint(null),
   });
@@ -88,6 +90,31 @@ boot();
 /* Service worker: solo en producción con https o localhost */
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
+    navigator.serviceWorker
+      .register("sw.js")
+      .then((reg) => {
+        /* Si hay un SW nuevo esperando, que tome el control ya. Al activarse
+           borra la caché vieja, así que recargamos una vez para no seguir
+           viendo CSS o JS anteriores a esta versión. */
+        reg.addEventListener("updatefound", () => {
+          const nuevo = reg.installing;
+          if (!nuevo) return;
+          nuevo.addEventListener("statechange", () => {
+            if (nuevo.state === "installed" && navigator.serviceWorker.controller) {
+              nuevo.postMessage({ type: "skip-waiting" });
+            }
+          });
+        });
+      })
+      .catch(() => {});
+
+    /* Si un controlador nuevo reemplaza al anterior, refresca UNA vez para
+       tomar el CSS/JS recién publicado. La marca en sessionStorage evita
+       que esto se convierta en un bucle de recargas. */
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (sessionStorage.getItem("cm-sw-reload") === "1") return;
+      sessionStorage.setItem("cm-sw-reload", "1");
+      location.reload();
+    });
   });
 }

@@ -73,8 +73,12 @@ export function estadoTone(estado) {
 export function photoSlot({ label, hint = "", variant = "square", hasImage = false, src = "" }) {
   const clase = `cm-photo cm-photo--${variant}${hasImage ? " has-image" : ""}`;
   if (hasImage && src) {
+    /* data-cm-foto-fallback: si la URL existe en la base pero el archivo
+       ya no está en el bucket (por ejemplo se borró a mano), el <img>
+       quedaría roto. El JS lo cambia al recuadro punteado. */
     return `<div class="${clase}">
-      <img class="cm-photo__img" src="${escape(src)}" alt="${escape(label)}" loading="lazy" />
+      <img class="cm-photo__img" src="${escape(src)}" alt="${escape(label)}" loading="lazy"
+        data-cm-foto-fallback="${escape(label)}" />
     </div>`;
   }
   return `<div class="${clase}" role="img" aria-label="${escape(label)}">

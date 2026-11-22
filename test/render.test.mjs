@@ -12,7 +12,7 @@
 import {
   loginHTML,
   loadingHTML,
-  dockHTML,
+  drawerHTML,
   topbarHTML,
   emptyHTML,
   sinNegocioHTML,
@@ -63,17 +63,30 @@ ok("tiene titulo", login.includes("Tu negocio, en orden"));
 ok("tiene zona de mensaje", login.includes("data-cm-msg"));
 ok("no expone datos de sesion", !login.includes("u1"));
 
-console.log("\n--- Loading ---");
-ok("dice que esta cargando", loadingHTML().includes("Cargando"));
+console.log("\n--- Transición de carga ---");
+const boot = loadingHTML();
+ok("es una transicion a pantalla completa", boot.includes("cm-boot"));
+ok("NO escribe texto visible de carga", !boot.replace(/aria-label="[^"]*"/g, "").includes("Cargando"));
+ok("usa tarjeta de cristal", boot.includes("cm-boot__glass"));
+ok("el cristal es decorativo", /cm-boot__glass[^>]*aria-hidden="true"/.test(boot));
+ok("el logo va dentro del cristal", /cm-boot__glass"[^>]*>\s*<span class="cm-boot__mark"/.test(boot));
+ok("no queda el halo mareante", !boot.includes("cm-boot__halo"));
+ok("los lectores de pantalla sí saben que carga", boot.includes('role="status"') && boot.includes("aria-label="));
+ok("no usa la barra de progreso inventada", !boot.includes("<progress"));
 
-console.log("\n--- Barra inferior ---");
-const dock = dockHTML("tienda");
-ok("pinta las 4 pestanas", (dock.match(/data-cm-tab=/g) || []).length === 4);
-ok("tienda activa", dock.includes('aria-current="page"'));
-ok("marca la activa", dock.includes("is-active"));
-ok("incluye Pedidos", dock.includes("Pedidos"));
-const dockMenu = dockHTML("menu");
-ok("cambia de activa segun la pestana", dockMenu.includes("is-active"));
+console.log("\n--- Menú lateral (única navegación) ---");
+const lateral = drawerHTML({ activa: "tienda", nombre: "Ana", sub: "Taquería El Primo" });
+ok("es el menú de la esquina", lateral.includes("cm-drawer"));
+ok("pinta las 4 secciones", (lateral.match(/data-cm-tab=/g) || []).length === 4);
+ok("tienda activa", lateral.includes('aria-current="page"'));
+ok("marca la activa", lateral.includes("is-active"));
+ok("incluye Pedidos", lateral.includes("Pedidos"));
+ok("se puede cerrar", lateral.includes("data-cm-menu-close"));
+ok("muestra el negocio", lateral.includes("Taquería El Primo"));
+const lateralMenu = drawerHTML({ activa: "menu", nombre: "Ana" });
+ok("cambia de activa segun la seccion", /cm-drawer__item is-active[^>]*data-cm-tab="menu"/.test(lateralMenu));
+ok("escapa el nombre", drawerHTML({ activa: "tienda", nombre: "<b>x</b>" }).includes("&lt;b&gt;"));
+ok("sin barra inferior", !lateral.includes("dock-tab"));
 
 console.log("\n--- Cabecera ---");
 const bar = topbarHTML({ titulo: "Mi tienda", estado: "borrador" });
@@ -114,6 +127,36 @@ ok("el badge de estado vive en la cabecera", topbarHTML({ titulo: "Tienda", esta
 ok("explica el estado borrador", tienda.includes("Solo lo ves tú"));
 ok("muestra el espacio de portada", tienda.includes("Foto de portada"));
 ok("muestra el espacio de logo", tienda.includes("Logo"));
+
+/* --- Fotos reales ---
+   Sin foto_url la vista pinta el recuadro punteado; con foto_url
+   tiene que salir un <img> y no un recuadro vacío. */
+ok("sin foto no pinta img", !tienda.includes("<img"));
+ok("portada y logo son pulsables", tienda.includes('data-cm-foto="portada"') && tienda.includes('data-cm-foto="logo"'));
+ok("hay input de archivo", tienda.includes("data-cm-foto-input"));
+
+const tiendaConFoto = tiendaHTML({
+  negocio: {
+    ...negocio,
+    foto_url: "https://pub-abc.r2.dev/negocios/u1/portada.webp",
+    logo_url: "https://pub-abc.r2.dev/negocios/u1/logo.webp",
+  },
+});
+ok("con portada pinta img", tiendaConFoto.includes("<img"));
+ok("la portada apunta al bucket", tiendaConFoto.includes("negocios/u1/portada.webp"));
+ok("el logo apunta al bucket", tiendaConFoto.includes("negocios/u1/logo.webp"));
+ok("marca has-image", tiendaConFoto.includes("has-image"));
+
+/* El comerciante no controla la URL, pero un dato raro en la base no
+   debe poder inyectar HTML en la página. */
+const tiendaInyectada = tiendaHTML({
+  negocio: { ...negocio, foto_url: 'x" onerror="alert(1)' },
+});
+ok("escapa la url de la foto", tiendaInyectada.includes("&quot;") && !tiendaInyectada.includes('onerror="alert(1)"'));
+
+/* Sin Worker configurado los botones quedan desactivados: mejor no
+   ofrecer una subida que va a fallar. */
+ok("sin worker los botones van desactivados", (tienda.match(/disabled/g) || []).length >= 2);
 ok("avisa que falta la colonia", tienda.includes("Sin colonia"));
 ok("avisa que falta el WhatsApp", tienda.includes("Sin WhatsApp"));
 ok("avisa que falta el horario", tienda.includes("Sin horario"));
@@ -222,7 +265,25 @@ ok("boton guardar", fProd.includes('type="submit"'));
 ok("boton cancelar", fProd.includes("data-cm-cancelar"));
 ok("no inventa precio", !fProd.includes('value="15'));
 ok("el alta de producto empieza vacia", fProd.includes('name="nombre" type="text" required maxlength="60"'));
-ok("sin precio precargado", !/name="precio"[^>]*value=/.test(fProd));
+ok("sin precio precargado", /name="precio"[^>]*value=""/.test(fProd));
+ok("alta sin nombre precargado", /name="nombre"[^>]*value=""/.test(fProd));
+ok("alta sin descripcion precargada", /name="descripcion"[^>]*value=""/.test(fProd));
+
+/* Editar: el formulario se prellena con el producto que recibe */
+const fProdEdit = productoFormHTML({
+  producto: {
+    id: "p-1",
+    nombre: "Jugo verde",
+    descripcion: "Con nopal",
+    precio_centavos: 3550,
+    disponible: true,
+  },
+});
+ok("edicion trae el titulo de editar", fProdEdit.includes("Editar producto"));
+ok("edicion precarga el nombre", fProdEdit.includes('value="Jugo verde"'));
+ok("edicion precarga la descripcion", fProdEdit.includes('value="Con nopal"'));
+ok("edicion convierte centavos a pesos", fProdEdit.includes('value="35.50"'));
+ok("edicion escapa el nombre", !fProdEdit.includes('value="<'));
 
 console.log("\n--- Piezas puras ---");
 const slotVacio = photoSlot({ label: "Foto de portada" });
@@ -265,6 +326,70 @@ ok("categoriaLabel desconocida vacia", categoriaLabel("noexiste") === "");
 ok("categoriaLabel valida", categoriaLabel("comida").length > 0);
 ok("initial con nombre", initial("juana") === "J");
 ok("initial vacio", initial("") === "·");
+
+/* ==========================================================================
+   Regresión: el menú lateral NO existe en el DOM si está cerrado.
+   El bug real fue ver su texto (nombre, correo, "Cerrar menú") suelto
+   debajo de la barra inferior. Montarlo solo al abrirlo hace imposible
+   que eso vuelva a pasar, aunque el CSS falte o esté cacheado viejo.
+   ========================================================================== */
+
+import { readFileSync } from "node:fs";
+
+console.log("\n--- Menú lateral fuera del flujo ---");
+
+const css = readFileSync(new URL("../styles/panel.css", import.meta.url), "utf8");
+const fuentePanel = readFileSync(
+  new URL("../features/panel/index.js", import.meta.url),
+  "utf8"
+);
+const fuenteApp = readFileSync(new URL("../app.js", import.meta.url), "utf8");
+
+const reglaCompartida = css.match(/\.cm-overlay,\s*\.cm-drawer\s*\{([^}]*)\}/);
+const cuerposDrawer = [...css.matchAll(/(?:^|\n)\.cm-drawer\s*\{([^}]*)\}/g)];
+const cuerpoDrawer = cuerposDrawer.length
+  ? cuerposDrawer[cuerposDrawer.length - 1][1]
+  : "";
+
+ok("overlay y drawer comparten bloque", Boolean(reglaCompartida));
+ok(
+  "ese bloque es position absolute",
+  Boolean(reglaCompartida) && /position:\s*absolute/.test(reglaCompartida[1])
+);
+ok(
+  "ese bloque no deja que crezca en flex",
+  Boolean(reglaCompartida) && /flex:\s*0\s*0\s*auto/.test(reglaCompartida[1])
+);
+ok("el drawer cerrado arranca fuera de pantalla", /translateX\(-102%\)/.test(cuerpoDrawer));
+ok("abierto vuelve a su sitio", /\.cm-drawer\.is-open\s*\{[^}]*transform:\s*none/.test(css));
+ok("tiene animacion de entrada", /@keyframes cm-drawer-in/.test(css));
+ok(
+  "no hay regla que lo meta en el flujo",
+  !/\.cm-drawer\s*\{[^}]*position:\s*static/.test(css)
+);
+
+/* Contrato de JS: se monta al abrir y se destruye al cerrar */
+ok("el panel tiene desmontarMenu", /function desmontarMenu\s*\(/.test(fuentePanel));
+ok(
+  "cerrar el menu lo elimina del DOM",
+  /function desmontarMenu\s*\([^)]*\)\s*\{[\s\S]*?drawer\.remove\(\)/.test(fuentePanel)
+);
+ok(
+  "abrir el menu se monta solo entonces",
+  /function montarMenu\s*\(/.test(fuentePanel) && /if \(open\) \{\s*montarMenu/.test(fuentePanel)
+);
+ok(
+  "el estado no depende del DOM",
+  /let menuAbierto = false/.test(fuentePanel)
+);
+ok(
+  "el desmontaje del panel limpia el menu",
+  /return \(\) => \{\s*reset\(\);\s*desmontarMenu\(\);/.test(fuentePanel)
+);
+ok(
+  "app.js barre menus huerfanos al repintar",
+  /querySelectorAll\("\[data-cm-drawer\], \[data-cm-overlay\]"\)/.test(fuenteApp)
+);
 
 console.log(`\n${pass} PASA / ${fail} FALLA`);
 if (fail > 0) process.exit(1);

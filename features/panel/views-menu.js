@@ -84,6 +84,10 @@ function prodHTML(p) {
             disponible ? content.menu.available : content.menu.unavailable
           }</span>
         </button>
+        <button type="button" class="cm-icon-btn" data-cm-edit="${escape(p.id)}"
+          aria-label="${escape(content.menu.editCta)}">
+          ${ico.pencil}
+        </button>
         <button type="button" class="cm-icon-btn" data-cm-del="${escape(p.id)}"
           aria-label="${escape(content.menu.deleteCta)}">
           ${ico.trash}

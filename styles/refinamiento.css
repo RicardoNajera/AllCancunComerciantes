@@ -1,0 +1,712 @@
+/* ==========================================================================
+   All Cancún Comercios — Capa de refinamiento
+   --------------------------------------------------------------------------
+   Se carga DESPUÉS de panel.css y solo ajusta. No reescribe: hereda.
+
+   Criterio de diseño (el de las interfaces que la gente no tiene que
+   aprender):
+     1. Rejilla de 12 columnas. Nada se centra por accidente.
+     2. Asimetría con intención: el contenido pesa a la izquierda,
+        el estado y las acciones viven a la derecha.
+     3. Jerarquía por tamaño y peso, no por color ni por cajas.
+     4. Un solo acento (aqua). El resto es escala de grises.
+     5. El aire va arriba, la densidad abajo: agrupar > separar.
+     6. Bordes de 1px en vez de sombras. Menos ruido, más estructura.
+   ========================================================================== */
+
+:root {
+  --grid: 12;
+  --gutter: var(--space-4);
+
+  /* Ritmo vertical: una sola escala para todo el panel */
+  --rhythm-1: 4px;
+  --rhythm-2: 8px;
+  --rhythm-3: 14px;
+  --rhythm-4: 22px;
+  --rhythm-5: 34px;
+  --rhythm-6: 54px;
+
+  /* Línea base de texto */
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-base: 1.6;
+
+  /* Trazo estructural */
+  --hairline: 1px solid var(--color-border);
+  --hairline-strong: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/* --------------------------------------------------------------------------
+   1. Rejilla maestra
+   Todo contenedor de pestaña es una rejilla. Los hijos declaran cuántas
+   columnas ocupan. Así la asimetría es explícita y no producto del azar.
+   -------------------------------------------------------------------------- */
+
+.cm-tab {
+  display: grid;
+  grid-template-columns: repeat(var(--grid), minmax(0, 1fr));
+  column-gap: var(--gutter);
+  row-gap: var(--rhythm-4);
+  align-content: start;
+}
+
+/* Por defecto, los bloques directos toman todo el ancho */
+.cm-tab > * {
+  grid-column: 1 / -1;
+}
+
+/* Ritmo: lo primero respira más */
+.cm-tab > *:first-child {
+  margin-top: var(--rhythm-2);
+}
+
+/* --------------------------------------------------------------------------
+   2. Cabecera de pestaña — asimétrica por construcción
+   Etiqueta pequeña a la izquierda, acción a la derecha, alineadas por
+   la línea base. El espacio vacío del centro es deliberado.
+   -------------------------------------------------------------------------- */
+
+.cm-toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: var(--rhythm-3);
+  padding-bottom: var(--rhythm-2);
+  border-bottom: var(--hairline);
+}
+
+.cm-toolbar__count {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* --------------------------------------------------------------------------
+   3. Tarjetas — estructura sobre adorno
+   Sin blur, sin degradado. Un plano sólido y un borde. La jerarquía la
+   carga la tipografía.
+   -------------------------------------------------------------------------- */
+
+.cm-card {
+  position: relative;
+  gap: var(--rhythm-3);
+  padding: var(--rhythm-4) var(--rhythm-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  border: var(--hairline);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Marca de estructura: una línea vertical que ancla la tarjeta.
+   Refuerza la lectura en Z de izquierda a derecha. */
+.cm-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: var(--rhythm-4);
+  bottom: var(--rhythm-4);
+  width: 2px;
+  border-radius: 0 2px 2px 0;
+  background: var(--color-border);
+}
+
+.cm-card--acento::before,
+.cm-tab--tienda .cm-card:first-of-type::before {
+  background: var(--color-brand);
+}
+
+/* Cabecera interna: título ocupa el espacio, chip se pega a la derecha */
+.cm-card__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--rhythm-3);
+}
+
+.cm-card__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.021em;
+  line-height: var(--leading-tight);
+}
+
+.cm-card__label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  color: color-mix(in srgb, var(--color-text-secondary) 82%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   4. Botones — un solo acento, el resto es contorno
+   -------------------------------------------------------------------------- */
+
+.cm-btn {
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.005em;
+  transition: background var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.cm-btn:active:not([disabled]) {
+  transform: scale(0.985);
+}
+
+.cm-btn--ghost {
+  background: transparent;
+  border: var(--hairline);
+}
+
+.cm-btn--ghost:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Acción secundaria: texto con peso, sin caja. Menos ruido. */
+.cm-icon-btn {
+  border-radius: 8px;
+  transition: background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.cm-icon-btn:hover {
+  background: color-mix(in srgb, var(--color-surface-muted) 90%, transparent);
+  color: var(--color-text);
+}
+
+
+/* --------------------------------------------------------------------------
+   5. Lista de productos — fila con rejilla propia
+   Foto | texto (cede) | acciones (fija). Los controles nunca se comprimen.
+   -------------------------------------------------------------------------- */
+
+.cm-prods {
+  gap: 0;
+  border-top: var(--hairline);
+}
+
+.cm-prod {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--rhythm-3);
+  padding: var(--rhythm-3) 0;
+  border-bottom: var(--hairline);
+  border-radius: 0;
+}
+
+.cm-prod__name {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.01em;
+  line-height: var(--leading-snug);
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cm-prod__desc {
+  font-size: var(--font-size-xs);
+  line-height: var(--leading-snug);
+  color: color-mix(in srgb, var(--color-text-secondary) 88%, transparent);
+}
+
+/* El precio sostiene la fila: es el dato que se busca primero */
+.cm-prod__price {
+  margin: var(--rhythm-1) 0 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-brand);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.cm-prod__side {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-1);
+}
+/* --------------------------------------------------------------------------
+   6. Vacíos — alineados a la izquierda, no centrados por reflejo
+   -------------------------------------------------------------------------- */
+
+.cm-empty {
+  display: grid;
+  justify-items: start;
+  text-align: left;
+  gap: var(--rhythm-3);
+  padding: var(--rhythm-6) 0;
+  border-top: var(--hairline);
+}
+
+.cm-empty__title {
+  font-size: 1.375rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.026em;
+  line-height: var(--leading-tight);
+  max-width: 22ch;
+}
+
+.cm-empty__lead {
+  font-size: var(--font-size-md);
+  line-height: var(--leading-base);
+  color: var(--color-text-secondary);
+  max-width: 34ch;
+}
+
+.cm-empty__ico {
+  color: color-mix(in srgb, var(--color-brand) 70%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   7. Formularios — etiqueta pegada al campo, campos a ancho completo
+   -------------------------------------------------------------------------- */
+
+.cm-form {
+  display: grid;
+  gap: var(--rhythm-4);
+  padding-top: var(--rhythm-3);
+}
+
+.cm-form__title {
+  font-size: 1.375rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.026em;
+  line-height: var(--leading-tight);
+}
+
+.cm-field {
+  display: grid;
+  gap: var(--rhythm-1);
+}
+
+.cm-field__hint {
+  font-size: var(--font-size-xs);
+  line-height: var(--leading-snug);
+  color: color-mix(in srgb, var(--color-text-secondary) 82%, transparent);
+}
+
+.cm-input {
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  border: var(--hairline);
+  transition: border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+}
+
+.cm-input:focus {
+  border-color: var(--color-brand);
+  background: var(--color-surface);
+  outline: none;
+}
+
+/* --------------------------------------------------------------------------
+   8. Números y datos — siempre tabulares, siempre alineados
+   -------------------------------------------------------------------------- */
+
+.cm-data,
+.cm-status,
+.cm-chip {
+  font-variant-numeric: tabular-nums;
+}
+
+.cm-status {
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.01em;
+}
+
+/* --------------------------------------------------------------------------
+   9. Accesibilidad — respeta a quien pide menos movimiento
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .cm-tab,
+  .cm-btn,
+  .cm-icon-btn,
+  .cm-input {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Foco visible para navegación con teclado */
+.cm-btn:focus-visible,
+.cm-icon-btn:focus-visible,
+.cm-input:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+:root {
+  /* Paleta de iconos — saturada, legible sobre fondo oscuro.
+     Cada tono tiene relleno y línea para dar volumen sin sombras. */
+  --ico-aqua: #22e3cb;
+  --ico-aqua-line: #0d9e8e;
+  --ico-violeta: #a78bfa;
+  --ico-violeta-line: #7c5cf0;
+  --ico-ambar: #ffb340;
+  --ico-ambar-line: #d98324;
+  --ico-rosa: #ff77b3;
+  --ico-rosa-line: #d94f8c;
+  --ico-cielo: #5cb8ff;
+  --ico-cielo-line: #2f8fe0;
+  --ico-lima: #a3e635;
+  --ico-lima-line: #74b816;
+  --ico-coral: #ff8a5b;
+  --ico-coral-line: #dd6532;
+  --ico-rojo: #ff6b6b;
+  --ico-rojo-line: #d63f3f;
+}
+
+/* El glifo del icono hereda su propio color, no el del contenedor */
+.ico {
+  display: block;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+
+/* Contenedor con fondo tonal: le da cuerpo al icono */
+.cm-empty__ico {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+}
+
+/* Los iconos de acción suben de tono al pasar el cursor */
+.cm-icon-btn .ico {
+  transition: filter var(--duration-fast) var(--ease-out);
+}
+
+.cm-icon-btn:hover .ico {
+  filter: brightness(1.25);
+}
+
+/* Los iconos solidos llevan su tono en el relleno y un borde mas oscuro
+   del mismo color: dan volumen sin sombra y se leen a 16px. */
+.ico g {
+  stroke-width: 1.9;
+}
+
+/* Anillo tonal detras de los iconos de accion: los saca del fondo */
+.cm-icon-btn {
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  border-radius: 9px;
+  background: var(--color-surface-muted);
+  border: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+}
+
+.cm-icon-btn:hover {
+  background: color-mix(in srgb, var(--color-surface-muted) 70%, #fff 6%);
+}
+
+/* ==========================================================================
+   Vista de Ajustes
+   Identidad arriba, datos agrupados, salir aislado. Una sola columna de
+   lectura: el ojo nunca tiene que elegir dónde empezar.
+   ========================================================================== */
+
+.cm-tab--ajustes {
+  row-gap: var(--rhythm-5);
+}
+
+.aj-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--rhythm-3);
+  padding: var(--rhythm-3) var(--rhythm-3);
+  border: var(--hairline);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-surface) 92%, transparent),
+    color-mix(in srgb, var(--color-surface) 70%, transparent)
+  );
+}
+
+.aj-hero__avatar {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  font-size: 1.375rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.03em;
+  color: var(--color-text-inverse);
+  background: linear-gradient(
+    150deg,
+    var(--ico-aqua) 0%,
+    var(--ico-cielo) 100%
+  );
+}
+
+.aj-hero__text {
+  min-width: 0;
+}
+
+.aj-hero__name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.026em;
+  line-height: var(--leading-tight);
+  overflow-wrap: anywhere;
+}
+
+.aj-hero__sub {
+  margin: 3px 0 0;
+  font-size: var(--font-size-xs);
+  line-height: var(--leading-snug);
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* Estado del perfil: se lee de un vistazo, sin entrar a comprobarlo */
+.aj-hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: var(--ico-ambar);
+  background: color-mix(in srgb, var(--ico-ambar) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ico-ambar-line) 40%, transparent);
+}
+
+.aj-hero__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.aj-hero__count {
+  padding-left: 6px;
+  margin-left: 2px;
+  border-left: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+.aj-hero__badge.is-ok {
+  color: var(--ico-lima);
+  background: color-mix(in srgb, var(--ico-lima) 13%, transparent);
+  border-color: color-mix(in srgb, var(--ico-lima-line) 40%, transparent);
+}
+
+/* ---------- Grupos de datos ---------- */
+
+.aj-group {
+  display: grid;
+  gap: var(--rhythm-2);
+}
+
+.aj-group__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--rhythm-2);
+}
+
+.aj-group__title {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text-secondary) 78%, transparent);
+}
+
+.aj-group__hint {
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--color-text-secondary) 60%, transparent);
+}
+
+/* Tarjeta contenedora: un plano sólido, las filas dentro */
+.aj-card {
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  border: var(--hairline);
+  overflow: hidden;
+}
+
+/* ---------- Filas de dato ---------- */
+
+.aj-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--rhythm-3);
+  width: 100%;
+  min-height: 60px;
+  padding: var(--rhythm-3);
+  border: 0;
+  border-top: var(--hairline);
+  background: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.aj-card > .aj-row:first-child {
+  border-top: 0;
+}
+
+.aj-row.is-static,
+.aj-row--static {
+  cursor: default;
+}
+
+.aj-row:not(.aj-row--static):hover {
+  background: color-mix(in srgb, var(--color-surface-muted) 55%, transparent);
+}
+
+.aj-row:not(.aj-row--static):active {
+  background: color-mix(in srgb, var(--color-surface-muted) 80%, transparent);
+}
+
+.aj-row:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: -2px;
+}
+
+.aj-row__ico {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--color-surface-muted);
+  border: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+}
+
+.aj-row__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.aj-row__title {
+  font-size: var(--font-size-xs);
+  line-height: var(--leading-snug);
+  color: color-mix(in srgb, var(--color-text-secondary) 80%, transparent);
+}
+
+.aj-row__value {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: -0.01em;
+  line-height: var(--leading-snug);
+  overflow-wrap: anywhere;
+}
+
+/* Lo que falta se ve como falta, no como error */
+.aj-row__value.is-empty {
+  color: color-mix(in srgb, var(--color-text-secondary) 62%, transparent);
+  font-weight: var(--font-weight-regular);
+  font-style: italic;
+}
+
+.aj-row__chev {
+  display: grid;
+  place-items: center;
+  color: color-mix(in srgb, var(--color-text-secondary) 55%, transparent);
+}
+
+/* ---------- Salir: acción destructiva, aislada del resto ---------- */
+
+.aj-signout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rhythm-2);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 0 var(--rhythm-3);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--ico-coral-line) 38%, transparent);
+  background: none;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--ico-coral);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.aj-signout:hover {
+  border-color: color-mix(in srgb, var(--ico-coral-line) 70%, transparent);
+  background: color-mix(in srgb, var(--ico-coral) 9%, transparent);
+}
+
+/* Armarse para salir: dos toques, el segundo en rojo pleno */
+.aj-signout.is-armed {
+  color: var(--color-text);
+  background: var(--ico-rojo);
+  border-color: var(--ico-rojo-line);
+}
+
+.aj-signout__ico {
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- Pie ---------- */
+
+.aj-foot {
+  margin: 0;
+  padding-top: var(--rhythm-2);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: color-mix(in srgb, var(--color-text-secondary) 45%, transparent);
+}
+
+/* ---------- Acción principal: editar el negocio ---------- */
+
+.aj-edit {
+  min-height: 48px;
+  margin-top: var(--rhythm-2);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-brand) 16%, var(--color-surface));
+  color: var(--color-text);
+  border: 1px solid color-mix(in srgb, var(--color-brand) 40%, transparent);
+  box-shadow: none;
+}
+
+.aj-edit:hover {
+  background: color-mix(in srgb, var(--color-brand) 24%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-brand) 60%, transparent);
+}
+
+.aj-edit__ico {
+  display: grid;
+  place-items: center;
+  color: var(--color-brand);
+}
+
+

@@ -92,4 +92,24 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
+
+  /* Paleta de iconos — saturada, legible sobre fondo oscuro.
+     Cada tono lleva relleno y línea para dar volumen sin sombras.
+     Los usan los iconos sólidos de content.js: var(--ico-<tono>) */
+  --ico-aqua: #22e3cb;
+  --ico-aqua-line: #0d9e8e;
+  --ico-violeta: #a78bfa;
+  --ico-violeta-line: #7c5cf0;
+  --ico-ambar: #ffb340;
+  --ico-ambar-line: #d98324;
+  --ico-rosa: #ff77b3;
+  --ico-rosa-line: #d94f8c;
+  --ico-cielo: #5cb8ff;
+  --ico-cielo-line: #2f8fe0;
+  --ico-lima: #a3e635;
+  --ico-lima-line: #74b816;
+  --ico-coral: #ff8a5b;
+  --ico-coral-line: #dd6532;
+  --ico-rojo: #ff6b6b;
+  --ico-rojo-line: #d63f3f;
 }

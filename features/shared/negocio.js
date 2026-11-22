@@ -10,6 +10,41 @@ import { getSupabase } from "./supabase.js";
 
 /* ---- Negocio ---- */
 
+/** Guarda la URL de una foto (portada o logo). No toca el resto. */
+export async function guardarFotoNegocio(negocioId, tipo, url) {
+  const supabase = await getSupabase();
+  if (!supabase || !negocioId) return { negocio: null, error: "Sin sesión." };
+
+  const columna = tipo === "logo" ? "logo_url" : "foto_url";
+  const limpia = String(url || "").trim() || null;
+
+  const { data, error } = await supabase
+    .from("negocios")
+    .update({ [columna]: limpia })
+    .eq("id", negocioId)
+    .select(NEGOCIO_FIELDS)
+    .maybeSingle();
+
+  return { negocio: data || null, error: error?.message || null };
+}
+
+/** Igual para productos: la columna foto_url ya existía. */
+export async function guardarFotoProducto(productoId, url) {
+  const supabase = await getSupabase();
+  if (!supabase || !productoId) return { producto: null, error: "Sin sesión." };
+
+  const limpia = String(url || "").trim() || null;
+
+  const { data, error } = await supabase
+    .from("productos")
+    .update({ foto_url: limpia })
+    .eq("id", productoId)
+    .select(PRODUCTO_FIELDS)
+    .maybeSingle();
+
+  return { producto: data || null, error: error?.message || null };
+}
+
 const NEGOCIO_FIELDS = [
   "id",
   "dueno_id",
@@ -25,6 +60,7 @@ const NEGOCIO_FIELDS = [
   "latitude",
   "longitude",
   "foto_url",
+  "logo_url",
   "creado_en",
   "actualizado_en",
 ].join(",");
@@ -204,6 +240,31 @@ export async function crearProducto(negocioId, datos) {
       precio_centavos: precio,
       disponible: true,
     })
+    .select(PRODUCTO_FIELDS)
+    .maybeSingle();
+
+  return { producto: data || null, error: error?.message || null };
+}
+
+/** Actualiza un producto. El precio entra en pesos y se guarda en centavos. */
+export async function actualizarProducto(productoId, datos) {
+  const supabase = await getSupabase();
+  if (!supabase || !productoId) return { producto: null, error: "Sin sesión." };
+
+  const nombre = String(datos.nombre || "").trim();
+  if (nombre.length < 2) return { producto: null, error: "Escribe el nombre del producto." };
+
+  const precio = pesosACentavos(datos.precio);
+  if (precio === null) return { producto: null, error: "Escribe un precio válido." };
+
+  const { data, error } = await supabase
+    .from("productos")
+    .update({
+      nombre,
+      descripcion: String(datos.descripcion || "").trim() || null,
+      precio_centavos: precio,
+    })
+    .eq("id", productoId)
     .select(PRODUCTO_FIELDS)
     .maybeSingle();
 

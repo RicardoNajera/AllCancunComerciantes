@@ -1,0 +1,22 @@
+# All Cancún — Worker de fotos
+#
+# Desplegar:   npx wrangler deploy
+# Secrets:     npx wrangler secret put R2_ACCESO
+#              npx wrangler secret put R2_SECRETO
+#              npx wrangler secret put SUPABASE_ANON_KEY
+#
+# Los secrets NO van en este archivo: wrangler los guarda cifrados en
+# Cloudflare y este archivo se sube a git.
+
+name = "all-cancun-fotos"
+main = "index.js"
+compatibility_date = "2025-01-01"
+
+# Bucket público. No es secreto: el nombre se ve en la URL pública.
+# R2_ACCOUNT_ID es el ID de cuenta de Cloudflare, necesario para armar
+# el endpoint S3. Tampoco es secreto: se ve en el panel de Cloudflare.
+[vars]
+R2_BUCKET = "all-cancun"
+R2_ACCOUNT_ID = "6073feea89ebe3f376f8ec91d6e733a8"
+
+# Sin rutas personalizadas: el Worker vive en <nombre>.<usuario>.workers.dev
