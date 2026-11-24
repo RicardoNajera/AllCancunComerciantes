@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>All Cancún Comercios — Lo que venden tus vecinos</title>
+  <meta name="description" content="Descubre los comercios de Cancún: comida, abarrotes, belleza y más, con su menú y su WhatsApp para pedir." />
+  <meta name="theme-color" content="#0b0e13" />
+
+  <!-- Vista previa al compartir el enlace por WhatsApp -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="All Cancún Comercios" />
+  <meta property="og:description" content="Lo que venden tus vecinos de Cancún, con su menú y su WhatsApp." />
+  <meta property="og:locale" content="es_MX" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+  <!-- Mismos tokens que el panel: una sola marca, dos caras -->
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/cliente.css" />
+</head>
+<body class="cl-body">
+  <header class="cl-top">
+    <a class="cl-top__marca" href="#/">
+      <span class="cl-top__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
+             stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+             stroke-linejoin="round">
+          <path d="M4 9h16l-1 11H5L4 9Z" />
+          <path d="M8 9V6a4 4 0 0 1 8 0v3" />
+        </svg>
+      </span>
+      <span class="cl-top__name">All Cancún <span>Comercios</span></span>
+    </a>
+    <a class="cl-top__mio" href="index.html">Soy comerciante</a>
+  </header>
+
+  <!-- Aquí se pinta la lista o el menú del negocio -->
+  <main class="cl-main" id="cl-app" aria-live="polite"></main>
+
+  <footer class="cl-pie">
+    <p>Hecho en Cancún, para Cancún.</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script type="module" src="features/cliente/index.js"></script>
+</body>
+</html>

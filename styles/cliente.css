@@ -1,0 +1,452 @@
+/* ==========================================================================
+   All Cancún Comercios — Catálogo público
+   La cara que ve el cliente. Usa los mismos tokens que el panel para que
+   se sienta el mismo producto, pero sin la densidad del panel: aquí el
+   cliente viene a mirar, no a trabajar. Más aire, fotos más grandes,
+   menos texto.
+   ========================================================================== */
+
+.cl-body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Barra superior ---------- */
+
+.cl-top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(11, 14, 19, 0.82);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cl-top__marca {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  color: var(--color-text);
+  min-width: 0;
+}
+
+/* El bolso en turquesa: el único acento de la barra */
+.cl-top__mark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  color: var(--color-brand);
+  background: var(--color-brand-soft);
+}
+
+.cl-top__name {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cl-top__name span {
+  color: var(--color-brand);
+}
+
+/* Enlace al panel: existe, pero no compite con el catálogo */
+.cl-top__mio {
+  flex: 0 0 auto;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  padding: 7px 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.cl-top__mio:hover,
+.cl-top__mio:focus-visible {
+  color: var(--color-brand);
+  border-color: var(--color-brand);
+}
+
+/* ---------- Contenido ---------- */
+
+.cl-main {
+  flex: 1;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px 16px 32px;
+  box-sizing: border-box;
+}
+
+/* ---------- Filtros por categoría ---------- */
+
+.cl-filtros {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 0 12px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cl-filtros::-webkit-scrollbar {
+  display: none;
+}
+
+.cl-chip {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.cl-chip:hover,
+.cl-chip:focus-visible {
+  color: var(--color-text);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* Activa: turquesa de marca con texto oscuro, para que se lea */
+.cl-chip.is-on {
+  color: var(--color-text-inverse);
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cl-cuenta {
+  margin: 0 0 12px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Lista de comercios ---------- */
+
+.cl-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* La fila entera es el enlace: se puede tocar en cualquier parte,
+   no solo en el nombre. En el celular esa es la diferencia entre
+   abrir el negocio y dar un toque en el vacío. */
+.cl-negocio {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 10px;
+  border-radius: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.cl-negocio:hover,
+.cl-negocio:focus-visible {
+  border-color: rgba(47, 214, 196, 0.45);
+  background: var(--color-surface-muted);
+}
+
+.cl-negocio:active {
+  transform: scale(0.985);
+}
+
+.cl-negocio__media {
+  position: relative;
+  flex: 0 0 auto;
+  width: 60px;
+  height: 60px;
+  border-radius: 13px;
+  overflow: hidden;
+  background: var(--color-surface-muted);
+  display: grid;
+  place-items: center;
+}
+
+.cl-negocio__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Sin foto: la inicial grande. Se ve intencional, no roto. */
+.cl-negocio__inicial {
+  font-size: 1.375rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-brand);
+  opacity: 0.75;
+}
+
+.cl-negocio__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.cl-negocio__name {
+  margin: 0 0 3px;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cl-negocio__meta {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cl-negocio__go {
+  flex: 0 0 auto;
+  font-size: 1.375rem;
+  line-height: 1;
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+/* ---------- Ficha del negocio ---------- */
+
+.cl-ficha {
+  display: flex;
+  flex-direction: column;
+}
+
+/* La portada ancha: es lo primero que ve el cliente. Si no hay, el
+   bloque queda con el degradado de marca en vez de un hueco negro. */
+.cl-hero {
+  position: relative;
+  height: 190px;
+  margin: -16px -16px 0;
+  overflow: hidden;
+  background: linear-gradient(150deg, #2fd6c4 0%, #4fa8ff 100%);
+}
+
+.cl-hero__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cl-hero__vacio {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(150deg, #2fd6c4 0%, #4fa8ff 100%);
+  opacity: 0.25;
+}
+
+/* Volver: círculo flotante sobre la foto, no una flecha perdida */
+.cl-hero__volver {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(11, 14, 19, 0.66);
+  backdrop-filter: blur(8px);
+  color: var(--color-text);
+  font-size: 1.5rem;
+  line-height: 1;
+  text-decoration: none;
+  padding-bottom: 4px;
+  box-sizing: border-box;
+}
+
+.cl-hero__volver:hover,
+.cl-hero__volver:focus-visible {
+  background: rgba(11, 14, 19, 0.88);
+}
+
+.cl-cabecera {
+  padding: 16px 0 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* El logo se sube sobre la portada: truco clásico de perfil, hace que
+   la cabecera tenga profundidad en vez de ser texto plano apilado. */
+.cl-cabecera__logo {
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  object-fit: cover;
+  margin-top: -50px;
+  border: 3px solid var(--color-bg);
+  background: var(--color-surface-muted);
+  position: relative;
+  z-index: 1;
+}
+
+.cl-cabecera__name {
+  margin: 0;
+  font-size: calc(var(--font-size-lg) * 1.15);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+.cl-cabecera__meta {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-brand);
+  font-weight: var(--font-weight-medium);
+}
+
+.cl-cabecera__desc {
+  margin: 4px 0 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  max-width: 52ch;
+}
+
+.cl-cabecera__sin-wa {
+  margin: 8px 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  opacity: 0.75;
+}
+
+/* ---------- Menú del negocio ---------- */
+
+.cl-menu {
+  margin-top: 18px;
+}
+
+.cl-seccion {
+  margin: 24px 0 10px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+}
+
+.cl-prods {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* El producto: foto, texto y botón. El botón va aparte para que en
+   pantallas angostas el texto pueda encogerse sin aplastarlo. */
+.cl-prod {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.cl-prod__media {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--color-surface-muted);
+}
+
+.cl-prod__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cl-prod__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.cl-prod__name {
+  margin: 0 0 2px;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.cl-prod__desc {
+  margin: 0 0 6px;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.cl-prod__pie {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cl-prod__precio {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-brand);
+}
+
+/* Agotado: gris y tachado. Sigue visible porque el cliente prefiere
+   saber que existe y hoy no hay, a preguntar por algo que ya vio. */
+.cl-prod.is-off {
+  opacity: 0.5;
+}
+
+.cl-prod.is-off .cl-prod__name {
+  text-decoration: line-through;
+}
+
+.cl-prod__agotado {
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+
