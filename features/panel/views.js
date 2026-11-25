@@ -29,6 +29,7 @@ import {
 export function loginHTML() {
   return `
     <div class="cm-login">
+      <div class="cm-login__amb" aria-hidden="true"></div>
       <span class="cm-login__mark" aria-hidden="true">${ico.store}</span>
       <h1 class="cm-login__title">${escape(content.loginTitle)}</h1>
       <p class="cm-login__lead">${escape(content.loginLead)}</p>

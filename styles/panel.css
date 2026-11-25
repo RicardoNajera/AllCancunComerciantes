@@ -1802,7 +1802,87 @@ select.cm-input {
   padding: var(--space-6) var(--space-4);
   text-align: center;
   animation: cm-in var(--duration-base) var(--ease-out);
+  position: relative;
 }
+
+/* --- Ambiente inmersivo del login ---
+   Capas decorativas: aurora que respira + retícula de mapa en
+   perspectiva. Mismo lenguaje que el arranque de cristal: la app
+   se siente viva antes de entrar. No asume género ni edad. */
+
+.cm-login__amb {
+  position: absolute;
+  inset: -40px -20px auto;
+  height: 400px;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+}
+
+.cm-login__amb::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(44% 36% at 50% 24%, rgba(47, 214, 196, 0.22), transparent 72%),
+    radial-gradient(34% 30% at 84% 14%, rgba(79, 168, 255, 0.2), transparent 74%),
+    radial-gradient(30% 26% at 14% 20%, rgba(255, 122, 182, 0.12), transparent 76%);
+  filter: blur(36px);
+  animation: cm-amb-breathe 12s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.cm-login__amb::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background-image:
+    linear-gradient(rgba(47, 214, 196, 0.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47, 214, 196, 0.075) 1px, transparent 1px);
+  background-size: 42px 42px;
+  transform: perspective(560px) rotateX(56deg) translateY(4%);
+  transform-origin: 50% 100%;
+  animation: cm-amb-drift 24s linear infinite;
+  will-change: background-position;
+}
+
+@keyframes cm-amb-breathe {
+  0%   { transform: scale(1) translate3d(0, 0, 0);       opacity: 0.75; }
+  50%  { transform: scale(1.12) translate3d(2%, -2%, 0); opacity: 1; }
+  100% { transform: scale(1.04) translate3d(-2%, 1%, 0); opacity: 0.85; }
+}
+
+@keyframes cm-amb-drift {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 0 42px, 42px 0; }
+}
+
+/* La marca respira: dos anillos que se abren desde el logo */
+.cm-login__mark { position: relative; z-index: 1; }
+
+.cm-login__mark::before,
+.cm-login__mark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(47, 214, 196, 0.75);
+  animation: cm-amb-ping 3.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  pointer-events: none;
+}
+
+.cm-login__mark::after { animation-delay: 1.7s; }
+
+@keyframes cm-amb-ping {
+  0%   { transform: scale(1);   opacity: 0.5; }
+  70%  { opacity: 0.1; }
+  100% { transform: scale(2.15); opacity: 0; }
+}
+
+/* Contenido por encima del ambiente */
+.cm-login > :not(.cm-login__amb) { position: relative; z-index: 1; }
 
 .cm-login__mark {
   display: grid;
@@ -2021,6 +2101,21 @@ select.cm-input {
   .cm-boot__glass::before {
     animation: none;
   }
+
+  /* Login: se queda el color, se va el movimiento */
+  .cm-login__amb::before,
+  .cm-login__amb::after,
+  .cm-login__mark::before,
+  .cm-login__mark::after {
+    animation: none;
+  }
+
+  .cm-login__mark::before,
+  .cm-login__mark::after {
+    opacity: 0.22;
+  }
+
+  .cm-login__amb::before { opacity: 0.9; }
 }
 
 /* Configuración faltante */
